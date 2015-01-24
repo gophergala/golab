@@ -56,8 +56,9 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 		quality = 70
 	}
 
-	// Center gopher in view if possible
-	rect := image.Rect(0, 0, ViewWidth, ViewHeight).Add(image.Pt(int(model.Pos.X)-ViewWidth/2, int(model.Pos.Y)-ViewHeight/2))
+	// Center Gopher in view if possible
+	gpos := model.Gopher.Pos
+	rect := image.Rect(0, 0, ViewWidth, ViewHeight).Add(image.Pt(int(gpos.X)-ViewWidth/2, int(gpos.Y)-ViewHeight/2))
 
 	// But needs correction at the edges of the view (it can't be centered)
 	corr := image.Point{}
@@ -85,8 +86,10 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 
 // clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.
 func clickedHandle(w http.ResponseWriter, r *http.Request) {
+	Gopher := model.Gopher
+	
 	// If still moving, wait for it:
-	if int(model.Pos.X) != model.TargetPos.X || int(model.Pos.Y) != model.TargetPos.Y {
+	if int(Gopher.Pos.X) != Gopher.TargetPos.X || int(Gopher.Pos.Y) != Gopher.TargetPos.Y {
 		return
 	}
 
@@ -100,7 +103,7 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if new desired target is in the same row/column and if there is a free passage to there.
-	pCol, pRow := int(model.Pos.X)/model.BlockSize, int(model.Pos.Y)/model.BlockSize
+	pCol, pRow := int(Gopher.Pos.X)/model.BlockSize, int(Gopher.Pos.Y)/model.BlockSize
 	tCol, tRow := (Pos.X+x)/model.BlockSize, (Pos.Y+y)/model.BlockSize
 
 	sorted := func(a, b int) (int, int) {
@@ -129,12 +132,12 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 
 	// Target pos is allowed and reachable.
 	// Use target position rounded to the center of the target block:
-	model.TargetPos.X, model.TargetPos.Y = tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2
+	Gopher.TargetPos.X, Gopher.TargetPos.Y = tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2
 
 	// Mark target position visually for the player if it is not the current block:
 	if pRow != tRow || pCol != tCol {
 		rect := image.Rect(0, 0, model.BlockSize/4, model.BlockSize/4)
-		rect = rect.Add(image.Pt(model.TargetPos.X-rect.Dx()/2, model.TargetPos.Y-rect.Dy()/2))
+		rect = rect.Add(image.Pt(Gopher.TargetPos.X-rect.Dx()/2, Gopher.TargetPos.Y-rect.Dy()/2))
 		draw.Draw(model.LabImg, rect, model.TargetImg, image.Point{}, draw.Over)
 	}
 }

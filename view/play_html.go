@@ -8,7 +8,7 @@ const play_html = `<html>
 	h3             {padding: 1px; margin: 2px;}
 	#jsRequiredMsg {padding: 3px; margin: 3px; font-weight: bold; background: #faa;}
 	#controls      {padding: 2px;}
-	#controls *    {margin-left: 2px; margin-right: 2px;}
+	#controls *    {margin-left: 3px; margin-right: 3px;}
 	#view          {position: relative; padding: 1px;}
 	#img           {background: #000; border: 1px solid black;}
 	#errMsg        {visibility: hidden; position: absolute; top: 10px; right: 0px; width: 100%; color: #ff3030; font-weight: bold;}
@@ -54,7 +54,7 @@ const play_html = `<html>
 		<option value="1000">1</option>
 	</select>
 	
-	<button id="pauseResume" onclick="pauseResume()">Freeze</button>
+	<button id="pauseResume" onclick="pauseResume()" title="Stops refreshing the view but does not pauses the game">Freeze</button>
 	
 	<button id="newGame" onclick="newGame()">New Game</button>
 	

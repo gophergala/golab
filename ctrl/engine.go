@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"time"
+	"fmt"
 )
 
 // InitNew initializes a new game.
@@ -52,30 +53,33 @@ func simulate() {
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9
 
-		x, y := int(model.Pos.X), int(model.Pos.Y)
+		Gopher := model.Gopher
+
+		x, y := int(Gopher.Pos.X), int(Gopher.Pos.Y)
 
 		moved := false
 
+		fmt.Println(Gopher.TargetPos)
 		// Only horizontal or vertical movement is allowed!
-		if x != model.TargetPos.X {
-			dx := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.X)-model.Pos.X))
-			if x > model.TargetPos.X {
+		if x != Gopher.TargetPos.X {
+			dx := math.Min(dt*model.V, math.Abs(float64(Gopher.TargetPos.X)-Gopher.Pos.X))
+			if x > Gopher.TargetPos.X {
 				dx = -dx
-				model.Direction = model.DirLeft
+				Gopher.Direction = model.DirLeft
 			} else {
-				model.Direction = model.DirRight
+				Gopher.Direction = model.DirRight
 			}
-			model.Pos.X += dx
+			Gopher.Pos.X += dx
 			moved = true
-		} else if y != model.TargetPos.Y {
-			dy := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.Y)-model.Pos.Y))
-			if y > model.TargetPos.Y {
+		} else if y != Gopher.TargetPos.Y {
+			dy := math.Min(dt*model.V, math.Abs(float64(Gopher.TargetPos.Y)-Gopher.Pos.Y))
+			if y > Gopher.TargetPos.Y {
 				dy = -dy
-				model.Direction = model.DirUp
+				Gopher.Direction = model.DirUp
 			} else {
-				model.Direction = model.DirDown
+				Gopher.Direction = model.DirDown
 			}
-			model.Pos.Y += dy
+			Gopher.Pos.Y += dy
 			moved = true
 		}
 
@@ -83,14 +87,14 @@ func simulate() {
 			// Update lab image
 
 			// Clear gopher image from old pos
-			img := model.GopherImgs[model.Direction]
+			img := model.GopherImgs[Gopher.Direction]
 
 			b := img.Bounds()
 			rect := img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
 			draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
 
 			// Draw gopher at new position
-			x, y = int(model.Pos.X), int(model.Pos.Y)
+			x, y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
 			rect = img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
 			draw.Draw(model.LabImg, rect, img, image.Point{}, draw.Over)
 		}

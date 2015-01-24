@@ -13,15 +13,21 @@ var Mutex sync.Mutex
 // The model/data of the labyrinth
 var Lab [][]Block
 
-// The player's position in the labyrinth in pixel coordinates
-var Pos struct {
-	X, Y float64
+// MovingObj is a struct describing a moving object.
+type MovingObj struct {
+	// The position in the labyrinth in pixel coordinates
+	Pos struct {
+		X, Y float64
+	}
+
+	// Direction where the object is facing toward
+	Direction Dir
+	
+	// Target position the object is moving to
+	TargetPos image.Point
 }
 
-var Direction Dir
-
-// Target position the gopher is moving to
-var TargetPos image.Point
+var Gopher = new(MovingObj)
 
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
@@ -31,10 +37,10 @@ func InitNew() {
 	initLab()
 
 	// Position Gopher to top left corner
-	Pos.X = BlockSize + BlockSize/2
-	Pos.Y = Pos.X
-	Direction = DirRight
-	TargetPos.X, TargetPos.Y = int(Pos.X), int(Pos.Y)
+	Gopher.Pos.X = BlockSize + BlockSize/2
+	Gopher.Pos.Y = Gopher.Pos.X
+	Gopher.Direction = DirRight
+	Gopher.TargetPos.X, Gopher.TargetPos.Y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
 
 	initLabImg()
 }
@@ -68,9 +74,9 @@ func initLabImg() {
 	}
 
 	// Draw first gopher image
-	img := GopherImgs[Direction]
+	img := GopherImgs[Gopher.Direction]
 	b := img.Bounds()
-	r := img.Bounds().Add(image.Point{int(Pos.X) - b.Dx()/2, int(Pos.Y) - b.Dy()/2})
+	r := img.Bounds().Add(image.Point{int(Gopher.Pos.X) - b.Dx()/2, int(Gopher.Pos.Y) - b.Dy()/2})
 	draw.Draw(LabImg, r, img, b.Min, draw.Src)
 }
 
