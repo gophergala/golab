@@ -1,9 +1,5 @@
 package view
 
-import (
-	"image/color"
-)
-
 // Title as the application - as it appears in the Browser title
 const AppTitle = "Gopher's Labyrinth - First Gopher Gala (2015)"
 
@@ -12,10 +8,4 @@ const (
 	ViewWidth = 600
 	// Width of the client view in pixels
 	ViewHeight = 600
-)
-
-// Color "constants"
-var (
-	Black = color.RGBA{A: 0xff}
-	WallCol = color.RGBA{0xe0, 0xe0, 0xe0, 0xff}
 )

@@ -1,8 +1,12 @@
 package model
 
+import (
+	"image/color"
+)
+
 const (
 	// BlockSize is the size of the labyrinth unit in pixels.
-	BlockSize = 32
+	BlockSize = 40
 
 	// Rows is the number of rows in the labyrinth
 	Rows = 33
@@ -25,4 +29,10 @@ const (
 	BlockEmpty Block = iota
 	// Wall block
 	BlockWall
+)
+
+// Color "constants"
+var (
+	Black   = color.RGBA{A: 0xff}
+	WallCol = color.RGBA{0xe0, 0xe0, 0xe0, 0xff}
 )

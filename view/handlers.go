@@ -5,7 +5,6 @@ import (
 	"github.com/gophergala/golab/model"
 	"html/template"
 	"image"
-	"image/draw"
 	"image/jpeg"
 	"net/http"
 	"strconv"
@@ -19,9 +18,6 @@ var params = struct {
 }{AppTitle, ViewWidth, ViewHeight, time.Now().Unix()}
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
-
-// Image of the labyrinth
-var labImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, model.LabWidth, model.LabHeight))
 
 // The client's (browser's) view position inside the labyrinth image.
 var Pos image.Point
@@ -38,21 +34,7 @@ func init() {
 
 // InitNew initializes a new game.
 func InitNew() {
-	// Clear the labyrinth image
-	draw.Draw(labImg, labImg.Bounds(), image.NewUniform(Black), image.Pt(0, 0), draw.Over)
-
-	// Draw walls
-	wallImg := image.NewUniform(WallCol)
-	zeroPt := image.Point{}
-	for ri, row := range model.Lab {
-		for ci, block := range row {
-			if block == model.BlockWall {
-				x, y := ci * model.BlockSize, ri * model.BlockSize
-				rect := image.Rect(x, y, x + model.BlockSize, y + model.BlockSize) 
-				draw.Draw(labImg, rect, wallImg, zeroPt, draw.Over)
-			}
-		}
-	}
+	Pos = image.Point{}
 }
 
 // playHtmlHandle serves the html page where the user can play.
@@ -72,9 +54,9 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 	if err != nil || quality < 0 || quality > 100 {
 		quality = 70
 	}
-
+	
 	rect := image.Rect(0, 0, params.Width, params.Height)
-	jpeg.Encode(w, labImg.SubImage(rect), &jpeg.Options{quality})
+	jpeg.Encode(w, model.LabImg.SubImage(rect), &jpeg.Options{quality})
 }
 
 // clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.
@@ -93,7 +75,7 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 
 // cheatHandle serves the whole image of the labyrinth
 func cheatHandle(w http.ResponseWriter, r *http.Request) {
-	jpeg.Encode(w, labImg, &jpeg.Options{70})
+	jpeg.Encode(w, model.LabImg, &jpeg.Options{70})
 }
 
 // newGameHandle signals to start a newgame

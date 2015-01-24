@@ -1,6 +1,11 @@
 package model
 
 import (
+	"bytes"
+	"image"
+	"image/draw"
+	"image/png"
+	"io/ioutil"
 	"math/rand"
 	"sync"
 )
@@ -10,6 +15,32 @@ var Mutex sync.Mutex
 
 // The model/data of the labyrinth
 var Lab [][]Block
+
+// Image of the labyrinth
+var LabImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
+
+// Gopher image which has zero Min point
+var GopherImg *image.RGBA
+
+func init() {
+	// Load gopher image
+	data, err := ioutil.ReadFile("w:/gopher-small.png")
+	if err != nil {
+		panic(err)
+	}
+	src, err := png.Decode(bytes.NewBuffer(data))
+	if err != nil {
+		panic(err)
+	}
+
+	// Convert to image.RGBA, also make sure result image has zero Min point
+	b := src.Bounds()
+	if b.Dx() != BlockSize || b.Dy() != BlockSize {
+		panic("Invalid image size!")
+	}
+	GopherImg = image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+	draw.Draw(GopherImg, src.Bounds(), src, b.Min, draw.Src)
+}
 
 // The player's position in the labyrinth in pixel coordinates
 var Pos struct {
@@ -21,19 +52,48 @@ var NewGameCh = make(chan int, 1)
 
 // InitNew initializes a new game.
 func InitNew() {
-	Lab = make([][]Block, Rows)
-	for i := range Lab {
-		Lab[i] = make([]Block, Cols)
-	}
-	
-	// Zero value of the labyrinth is full of empty blocks
-
-	// generate labyrinth
-	genLab()
+	initLab()
 
 	// Position player to top left corner
 	Pos.X = BlockSize + BlockSize/2
 	Pos.Y = Pos.X
+
+	initLabImg()
+}
+
+func initLab() {
+	Lab = make([][]Block, Rows)
+	for i := range Lab {
+		Lab[i] = make([]Block, Cols)
+	}
+
+	// Zero value of the labyrinth is full of empty blocks
+
+	// generate labyrinth
+	genLab()
+}
+
+func initLabImg() {
+	// Clear the labyrinth image
+	draw.Draw(LabImg, LabImg.Bounds(), image.NewUniform(Black), image.Pt(0, 0), draw.Over)
+
+	// Draw walls
+	wallImg := image.NewUniform(WallCol)
+	zeroPt := image.Point{}
+	for ri, row := range Lab {
+		for ci, block := range row {
+			if block == BlockWall {
+				x, y := ci*BlockSize, ri*BlockSize
+				rect := image.Rect(x, y, x+BlockSize, y+BlockSize)
+				draw.Draw(LabImg, rect, wallImg, zeroPt, draw.Over)
+			}
+		}
+	}
+
+	// Draw first gopher image
+	b := GopherImg.Bounds()
+	r := GopherImg.Bounds().Add(image.Point{int(Pos.X) - b.Dx()/2, int(Pos.Y) - b.Dy()/2})
+	draw.Draw(LabImg, r, GopherImg, b.Min, draw.Src)
 }
 
 // genLab generates a random labyrinth.
