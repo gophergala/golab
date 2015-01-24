@@ -8,6 +8,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	_ "github.com/gophergala/golab/view"
 )
 
 var port int
