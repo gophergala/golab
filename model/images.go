@@ -20,7 +20,7 @@ var GopherImgs []*image.RGBA = make([]*image.RGBA, DirMax+1)
 var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirMax+1)
 
 // Image of the wall block
-var WallImg = image.NewUniform(WallCol)
+var WallImg image.Image //= image.NewUniform(WallCol)
 
 // Image of the empty block
 var EmptyImg = image.NewUniform(Black)
@@ -35,6 +35,8 @@ func init() {
 		// Load Bulldog images
 		BulldogImgs[i] = loadImg(fmt.Sprintf("w:/bulldog-%s.png", i))
 	}
+
+	WallImg = loadImg("w:/wall.png")
 }
 
 // loadImg loads a PNG image from the specified file, and converts it to image.RGBA and makes sure image has zero Min point.

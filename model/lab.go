@@ -22,12 +22,27 @@ type MovingObj struct {
 
 	// Direction where the object is facing toward
 	Direction Dir
-	
+
 	// Target position the object is moving to
 	TargetPos image.Point
+
+	// Images for each direction, each has zero Min point
+	Imgs []*image.RGBA
 }
 
+// drawImg draws the image of the MovingObj to the LabImg
+func (m *MovingObj) DrawImg() {
+	img := m.Imgs[Gopher.Direction]
+	b := img.Bounds()
+	r := img.Bounds().Add(image.Point{int(m.Pos.X) - b.Dx()/2, int(m.Pos.Y) - b.Dy()/2})
+	draw.Draw(LabImg, r, img, image.Point{}, draw.Src)
+}
+
+// Gopher is our hero, the moving object the user can control.
 var Gopher = new(MovingObj)
+
+// Slice of Bulldogs, the ancient enemy of Gophers.
+var Bulldogs = make([]*MovingObj, Rows*Cols/100)
 
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
@@ -36,15 +51,14 @@ var NewGameCh = make(chan int, 1)
 func InitNew() {
 	initLab()
 
-	// Position Gopher to top left corner
-	Gopher.Pos.X = BlockSize + BlockSize/2
-	Gopher.Pos.Y = Gopher.Pos.X
-	Gopher.Direction = DirRight
-	Gopher.TargetPos.X, Gopher.TargetPos.Y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
+	initGopher()
+
+	initBulldogs()
 
 	initLabImg()
 }
 
+// initLab initializes and generates a new Labyrinth.
 func initLab() {
 	Lab = make([][]Block, Rows)
 	for i := range Lab {
@@ -57,6 +71,33 @@ func initLab() {
 	genLab()
 }
 
+// initGopher initializes Gopher.
+func initGopher() {
+	// Position Gopher to top left corner
+	Gopher.Pos.X = BlockSize + BlockSize/2
+	Gopher.Pos.Y = Gopher.Pos.X
+	Gopher.Direction = DirRight
+	Gopher.TargetPos.X, Gopher.TargetPos.Y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
+	Gopher.Imgs = GopherImgs
+}
+
+// initBulldogs creates and initializes the Bulldogs.
+func initBulldogs() {
+	for i := 0; i < len(Bulldogs); i++ {
+		bd := new(MovingObj)
+		Bulldogs[i] = bd
+		// Place bulldog at a random position
+		var row, col int
+		// Give some space to Gopher: do not generate Bulldogs too close:
+		for ; row < 5 || col < 5; row, col = rPassPos(0, Rows), rPassPos(0, Cols) {
+		}
+		bd.Pos.X = float64(col*BlockSize + BlockSize/2)
+		bd.Pos.Y = float64(row*BlockSize + BlockSize/2)
+		bd.Imgs = BulldogImgs
+	}
+}
+
+// initLabImg initializes and draws the image of the Labyrinth.
 func initLabImg() {
 	// Clear the labyrinth image
 	draw.Draw(LabImg, LabImg.Bounds(), EmptyImg, image.Pt(0, 0), draw.Over)
@@ -74,10 +115,12 @@ func initLabImg() {
 	}
 
 	// Draw first gopher image
-	img := GopherImgs[Gopher.Direction]
-	b := img.Bounds()
-	r := img.Bounds().Add(image.Point{int(Gopher.Pos.X) - b.Dx()/2, int(Gopher.Pos.Y) - b.Dy()/2})
-	draw.Draw(LabImg, r, img, b.Min, draw.Src)
+	Gopher.DrawImg()
+
+	// Draw first bulldog images
+	for _, bd := range Bulldogs {
+		bd.DrawImg()
+	}
 }
 
 // genLab generates a random labyrinth.

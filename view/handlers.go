@@ -87,7 +87,7 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 // clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.
 func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	Gopher := model.Gopher
-	
+
 	// If still moving, wait for it:
 	if int(Gopher.Pos.X) != Gopher.TargetPos.X || int(Gopher.Pos.Y) != Gopher.TargetPos.Y {
 		return

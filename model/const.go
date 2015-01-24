@@ -20,7 +20,7 @@ const (
 	LabHeight = Rows * BlockSize
 )
 
-// V is the moving speed of gopher in pixel/sec.
+// V is the moving speed of Gopher in pixel/sec.
 const V = BlockSize * 2.0
 
 // Type of the unit of the labyrinth
@@ -52,16 +52,16 @@ const (
 	DirMax = DirDown
 )
 
-func (d Dir) String() (r string) {
+func (d Dir) String() string {
 	switch d {
 	case DirRight:
-		r = "right"
+		return "right"
 	case DirLeft:
-		r = "left"
+		return "left"
 	case DirUp:
-		r = "up"
+		return "up"
 	case DirDown:
-		r = "down"
+		return "down"
 	}
-	return
+	return ""
 }

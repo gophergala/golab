@@ -8,7 +8,6 @@ import (
 	"math"
 	"math/rand"
 	"time"
-	"fmt"
 )
 
 // InitNew initializes a new game.
@@ -59,7 +58,6 @@ func simulate() {
 
 		moved := false
 
-		fmt.Println(Gopher.TargetPos)
 		// Only horizontal or vertical movement is allowed!
 		if x != Gopher.TargetPos.X {
 			dx := math.Min(dt*model.V, math.Abs(float64(Gopher.TargetPos.X)-Gopher.Pos.X))
@@ -94,9 +92,7 @@ func simulate() {
 			draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
 
 			// Draw gopher at new position
-			x, y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
-			rect = img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
-			draw.Draw(model.LabImg, rect, img, image.Point{}, draw.Over)
+			Gopher.DrawImg()
 		}
 
 		t = now
