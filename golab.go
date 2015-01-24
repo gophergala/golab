@@ -3,12 +3,12 @@
 package main
 
 import (
-	"fmt"
-	"runtime"
 	"flag"
+	"fmt"
+	"github.com/gophergala/golab/ctrl"
 	"log"
 	"net/http"
-	_ "github.com/gophergala/golab/view"
+	"runtime"
 )
 
 var port int
@@ -17,13 +17,13 @@ var port int
 // Returns nil if everything is ok, else an error.
 func processFlags() error {
 	flag.IntVar(&port, "port", 60148, "Port to start the UI web server on; valid range: 0..65535")
-	
+
 	flag.Parse()
-	
+
 	if port < 0 || port > 65535 {
 		return fmt.Errorf("port %d is outside of range 0..65535", port)
 	}
-	
+
 	return nil
 }
 
@@ -32,13 +32,15 @@ func processFlags() error {
 // and starts the UI webserver.
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	
+
 	if err := processFlags(); err != nil {
 		fmt.Println(err)
 		flag.Usage()
 		return
 	}
-	
+
+	ctrl.InitNew()
+
 	fmt.Printf("Starting GoLab webserver on port %d...\n", port)
 	fmt.Printf("Open http://localhost:%d/\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))

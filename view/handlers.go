@@ -2,25 +2,29 @@ package view
 
 import (
 	"fmt"
+	"github.com/gophergala/golab/model"
 	"html/template"
 	"image"
+	"image/draw"
 	"image/jpeg"
 	"net/http"
 	"strconv"
 	"time"
-	"github.com/gophergala/golab/model"
 )
 
 var params = struct {
 	Title         string
 	Width, Height int
 	RunId         int64
-}{"Gopher's Labyrinth - First Gopher Gala (2015)", 600, 600, time.Now().Unix()}
+}{AppTitle, ViewWidth, ViewHeight, time.Now().Unix()}
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 
 // Image of the labyrinth
 var labImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, model.LabWidth, model.LabHeight))
+
+// The client's (browser's) view position inside the labyrinth image.
+var ViewPos image.Point
 
 // init registers the http handlers.
 func init() {
@@ -29,6 +33,12 @@ func init() {
 	http.HandleFunc("/img", imgHandle)
 	http.HandleFunc("/clicked", clickedHandle)
 	http.HandleFunc("/cheat", cheatHandle)
+}
+
+// InitNew initializes a new game.
+func InitNew() {
+	// Clear the labyrinth image
+	draw.Draw(labImg, labImg.Bounds(), image.NewUniform(Black), image.Pt(0, 0), draw.Over)
 }
 
 // playHtmlHandle serves the html page where the user can play.
@@ -63,7 +73,7 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	
+
 	fmt.Println("Clicked:", x, y)
 }
 
