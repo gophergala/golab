@@ -5,9 +5,9 @@ import (
 	"github.com/gophergala/golab/view"
 	"image"
 	"image/draw"
+	"math"
 	"math/rand"
 	"time"
-	"math"
 )
 
 // InitNew initializes a new game.
@@ -46,7 +46,7 @@ func simulate() {
 
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9
-		
+
 		x, y := int(model.Pos.X), int(model.Pos.Y)
 
 		moved := false
@@ -73,16 +73,16 @@ func simulate() {
 
 			// Clear gopher image from old pos
 			b := model.GopherImg.Bounds()
-			rect := model.GopherImg.Bounds().Add(image.Pt(x - b.Dx()/2, y - b.Dy()/2))
-			draw.Draw(model.LabImg, rect, image.NewUniform(model.Black), image.Point{}, draw.Over)
-			
+			rect := model.GopherImg.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
+			draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
+
 			// Draw gopher at new position
 			x, y = int(model.Pos.X), int(model.Pos.Y)
-			rect = model.GopherImg.Bounds().Add(image.Pt(x - b.Dx()/2, y - b.Dy()/2))
+			rect = model.GopherImg.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
 			draw.Draw(model.LabImg, rect, model.GopherImg, image.Point{}, draw.Over)
-			
+
 		}
-		
+
 		t = now
 	}
 }
