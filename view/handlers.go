@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"html/template"
 	"image"
-	"image/color"
 	"image/jpeg"
 	"net/http"
 	"strconv"
 	"time"
+	"github.com/gophergala/golab/model"
 )
 
 var params = struct {
@@ -19,10 +19,16 @@ var params = struct {
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 
+// Image of the labyrinth
+var labImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, model.LabWidth, model.LabHeight))
+
+// init registers the http handlers.
 func init() {
 	http.HandleFunc("/", playHtmlHandle)
 	http.HandleFunc("/runid", runIdHandle)
 	http.HandleFunc("/img", imgHandle)
+	http.HandleFunc("/clicked", clickedHandle)
+	http.HandleFunc("/cheat", cheatHandle)
 }
 
 // playHtmlHandle serves the html page where the user can play.
@@ -43,5 +49,25 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 		quality = 70
 	}
 
-	jpeg.Encode(w, image.NewUniform(color.RGBA{128, 128, 128, 255}), &jpeg.Options{quality})
+	rect := image.Rect(0, 0, params.Width, params.Height)
+	jpeg.Encode(w, labImg.SubImage(rect), &jpeg.Options{quality})
+}
+
+// clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.
+func clickedHandle(w http.ResponseWriter, r *http.Request) {
+	x, err := strconv.Atoi(r.FormValue("x"))
+	if err != nil {
+		return
+	}
+	y, err := strconv.Atoi(r.FormValue("y"))
+	if err != nil {
+		return
+	}
+	
+	fmt.Println("Clicked:", x, y)
+}
+
+// cheatHandle serves the whole image of the labyrinth
+func cheatHandle(w http.ResponseWriter, r *http.Request) {
+	jpeg.Encode(w, labImg, &jpeg.Options{70})
 }
