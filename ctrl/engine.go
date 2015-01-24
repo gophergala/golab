@@ -23,6 +23,8 @@ func initNew() {
 func StartEngine() {
 	model.NewGameCh <- 1 // Cannot block as application was just started, no incoming requests processed yet
 
+	model.Mutex.Lock()
+
 	go simulate()
 }
 
@@ -42,7 +44,10 @@ func simulate() {
 		// Iterations might not be exact, but we don't rely on it:
 		// We calculate delta time and calculate moving and next positions
 		// based on the delta time.
+		
+		model.Mutex.Unlock() // While sleeping, clients can request view images
 		time.Sleep(time.Millisecond * 50) // ~20 FPS
+		model.Mutex.Lock() // We will modify model now, labyrinth image might change so lock.
 
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9

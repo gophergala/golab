@@ -20,7 +20,7 @@ var params = struct {
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 
-// The client's (browser's) view position inside the labyrinth image.
+// The client's (browser's) view position inside the labyrinth image. This is the top-left point of the view.
 var Pos image.Point
 
 // init registers the http handlers.
@@ -56,8 +56,31 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 		quality = 70
 	}
 
-	rect := image.Rect(0, 0, params.Width, params.Height)
+	// Center gopher in view if possible
+	rect := image.Rect(0, 0, ViewWidth, ViewHeight).Add(image.Pt(int(model.Pos.X)-ViewWidth/2, int(model.Pos.Y)-ViewHeight/2))
+
+	// But needs correction at the edges of the view (it can't be centered)
+	corr := image.Point{}
+	if rect.Min.X < 0 {
+		corr.X = -rect.Min.X
+	}
+	if rect.Min.Y < 0 {
+		corr.Y = -rect.Min.Y
+	}
+	if rect.Max.X > model.LabWidth {
+		corr.X = model.LabWidth - rect.Max.X
+	}
+	if rect.Max.Y > model.LabHeight {
+		corr.Y = model.LabHeight - rect.Max.Y
+	}
+	rect = rect.Add(corr)
+
+	model.Mutex.Lock()
 	jpeg.Encode(w, model.LabImg.SubImage(rect), &jpeg.Options{quality})
+	model.Mutex.Unlock()
+	
+	// Store the new view's position:
+	Pos = rect.Min
 }
 
 // clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.

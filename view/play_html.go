@@ -50,7 +50,6 @@ const play_html = `<html>
 		<option value="100">10</option>
 		<option value="143">7</option>
 		<option value="200">5</option>
-		<option value="333">3</option>
 		<option value="500">2</option>
 		<option value="1000">1</option>
 	</select>
