@@ -71,6 +71,7 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Clicked:", x, y)
+	model.TargetPos.X, model.TargetPos.Y = x, y
 }
 
 // cheatHandle serves the whole image of the labyrinth

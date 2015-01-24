@@ -7,6 +7,7 @@ import (
 	"image/draw"
 	"math/rand"
 	"time"
+	"math"
 )
 
 // InitNew initializes a new game.
@@ -27,6 +28,8 @@ func StartEngine() {
 
 // simulate implements the game cycle
 func simulate() {
+	t := time.Now().UnixNano()
+
 	for {
 		// Check if we have to start a new game
 		select {
@@ -35,19 +38,51 @@ func simulate() {
 		default:
 		}
 
+		// Sleep some time.
+		// Iterations might not be exact, but we don't rely on it:
+		// We calculate delta time and calculate moving and next positions
+		// based on the delta time.
 		time.Sleep(time.Millisecond * 50) // ~20 FPS
 
-		var moved bool = false
+		now := time.Now().UnixNano()
+		dt := float64(now-t) / 1e9
+		
+		x, y := int(model.Pos.X), int(model.Pos.Y)
+
+		moved := false
+
+		// Only horizontal or vertical movement is allowed!
+		if x != model.TargetPos.X {
+			dx := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.X)-model.Pos.X))
+			if x > model.TargetPos.X {
+				dx = -dx
+			}
+			model.Pos.X += dx
+			moved = true
+		} else if y != model.TargetPos.Y {
+			dy := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.Y)-model.Pos.Y))
+			if y > model.TargetPos.Y {
+				dy = -dy
+			}
+			model.Pos.Y += dy
+			moved = true
+		}
 
 		if moved {
 			// Update lab image
 
 			// Clear gopher image from old pos
-			x, y := int(model.Pos.X)/model.BlockSize*model.BlockSize, int(model.Pos.Y)/model.BlockSize*model.BlockSize
-			rect := image.Rect(x, y, x+model.BlockSize, y+model.BlockSize)
+			b := model.GopherImg.Bounds()
+			rect := model.GopherImg.Bounds().Add(image.Pt(x - b.Dx()/2, y - b.Dy()/2))
 			draw.Draw(model.LabImg, rect, image.NewUniform(model.Black), image.Point{}, draw.Over)
-			// Draw gopher
+			
+			// Draw gopher at new position
+			x, y = int(model.Pos.X), int(model.Pos.Y)
+			rect = model.GopherImg.Bounds().Add(image.Pt(x - b.Dx()/2, y - b.Dy()/2))
 			draw.Draw(model.LabImg, rect, model.GopherImg, image.Point{}, draw.Over)
+			
 		}
+		
+		t = now
 	}
 }

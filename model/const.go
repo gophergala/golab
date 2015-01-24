@@ -20,6 +20,10 @@ const (
 	LabHeight = Rows * BlockSize
 )
 
+// V is the moving speed of gopher in pixel/sec.
+const V = BlockSize * 2.0
+ 
+
 // Type of the unit of the labyrinth
 type Block int
 

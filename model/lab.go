@@ -47,6 +47,9 @@ var Pos struct {
 	X, Y float64
 }
 
+// Target position the gopher is moving to
+var TargetPos image.Point
+
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
 
@@ -57,6 +60,7 @@ func InitNew() {
 	// Position player to top left corner
 	Pos.X = BlockSize + BlockSize/2
 	Pos.Y = Pos.X
+	TargetPos.X, TargetPos.Y = int(Pos.X), int(Pos.Y)
 
 	initLabImg()
 }
