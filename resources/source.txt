@@ -1,0 +1,4 @@
+These resources are not required at runtime, they are embedded into the executable binary.
+
+Original Gopher image from:
+	https://github.com/golang-samples/gopher-vector

@@ -15,6 +15,8 @@ Of course in the _"Go"_ way using `"go get"`:
 
 `go get github.com/gophergala/golab`
 
+The executable binary `golab` (produced by `"go install"`) contains all resources embedded (e.g. images, html templates), nothing else is required for it to run.
+
 Implementation
 ---
 
@@ -39,3 +41,4 @@ LICENSE
 
 See [LICENSE](https://github.com/gophergala/golab/blob/master/LICENSE.md)
 
+The GoLab Gopher is a derivative work based on the Go gopher which was designed by Renee French. ([http://reneefrench.blogspot.com/](http://reneefrench.blogspot.com/)). Licensed under the Creative Commons 3.0 Attributions license.

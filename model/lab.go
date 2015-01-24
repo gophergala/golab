@@ -18,6 +18,8 @@ var Pos struct {
 	X, Y float64
 }
 
+var Direction Dir
+
 // Target position the gopher is moving to
 var TargetPos image.Point
 
@@ -31,6 +33,7 @@ func InitNew() {
 	// Position Gopher to top left corner
 	Pos.X = BlockSize + BlockSize/2
 	Pos.Y = Pos.X
+	Direction = DirRight
 	TargetPos.X, TargetPos.Y = int(Pos.X), int(Pos.Y)
 
 	initLabImg()
@@ -65,9 +68,10 @@ func initLabImg() {
 	}
 
 	// Draw first gopher image
-	b := GopherImg.Bounds()
-	r := GopherImg.Bounds().Add(image.Point{int(Pos.X) - b.Dx()/2, int(Pos.Y) - b.Dy()/2})
-	draw.Draw(LabImg, r, GopherImg, b.Min, draw.Src)
+	img := GopherImgs[Direction]
+	b := img.Bounds()
+	r := img.Bounds().Add(image.Point{int(Pos.X) - b.Dx()/2, int(Pos.Y) - b.Dy()/2})
+	draw.Draw(LabImg, r, img, b.Min, draw.Src)
 }
 
 // genLab generates a random labyrinth.

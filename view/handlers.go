@@ -78,7 +78,7 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 	model.Mutex.Lock()
 	jpeg.Encode(w, model.LabImg.SubImage(rect), &jpeg.Options{quality})
 	model.Mutex.Unlock()
-	
+
 	// Store the new view's position:
 	Pos = rect.Min
 }
@@ -98,8 +98,6 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-
-	fmt.Println("Clicked:", x, y)
 
 	// Check if new desired target is in the same row/column and if there is a free passage to there.
 	pCol, pRow := int(model.Pos.X)/model.BlockSize, int(model.Pos.Y)/model.BlockSize

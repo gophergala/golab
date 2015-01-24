@@ -44,10 +44,10 @@ func simulate() {
 		// Iterations might not be exact, but we don't rely on it:
 		// We calculate delta time and calculate moving and next positions
 		// based on the delta time.
-		
-		model.Mutex.Unlock() // While sleeping, clients can request view images
+
+		model.Mutex.Unlock()              // While sleeping, clients can request view images
 		time.Sleep(time.Millisecond * 50) // ~20 FPS
-		model.Mutex.Lock() // We will modify model now, labyrinth image might change so lock.
+		model.Mutex.Lock()                // We will modify model now, labyrinth image might change so lock.
 
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9
@@ -61,6 +61,9 @@ func simulate() {
 			dx := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.X)-model.Pos.X))
 			if x > model.TargetPos.X {
 				dx = -dx
+				model.Direction = model.DirLeft
+			} else {
+				model.Direction = model.DirRight
 			}
 			model.Pos.X += dx
 			moved = true
@@ -68,6 +71,9 @@ func simulate() {
 			dy := math.Min(dt*model.V, math.Abs(float64(model.TargetPos.Y)-model.Pos.Y))
 			if y > model.TargetPos.Y {
 				dy = -dy
+				model.Direction = model.DirUp
+			} else {
+				model.Direction = model.DirDown
 			}
 			model.Pos.Y += dy
 			moved = true
@@ -77,15 +83,16 @@ func simulate() {
 			// Update lab image
 
 			// Clear gopher image from old pos
-			b := model.GopherImg.Bounds()
-			rect := model.GopherImg.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
+			img := model.GopherImgs[model.Direction]
+
+			b := img.Bounds()
+			rect := img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
 			draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
 
 			// Draw gopher at new position
 			x, y = int(model.Pos.X), int(model.Pos.Y)
-			rect = model.GopherImg.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
-			draw.Draw(model.LabImg, rect, model.GopherImg, image.Point{}, draw.Over)
-
+			rect = img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
+			draw.Draw(model.LabImg, rect, img, image.Point{}, draw.Over)
 		}
 
 		t = now

@@ -22,7 +22,6 @@ const (
 
 // V is the moving speed of gopher in pixel/sec.
 const V = BlockSize * 2.0
- 
 
 // Type of the unit of the labyrinth
 type Block int
@@ -40,3 +39,29 @@ var (
 	Black   = color.RGBA{A: 0xff}
 	WallCol = color.RGBA{0xe0, 0xe0, 0xe0, 0xff}
 )
+
+type Dir int
+
+// Directions of Gopher (facing directions)
+const (
+	DirRight Dir = iota
+	DirLeft
+	DirUp
+	DirDown
+
+	DirMax = DirDown
+)
+
+func (d Dir) String() (r string) {
+	switch d {
+	case DirRight:
+		r = "right"
+	case DirLeft:
+		r = "left"
+	case DirUp:
+		r = "up"
+	case DirDown:
+		r = "down"
+	}
+	return
+}
