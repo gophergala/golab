@@ -1,4 +1,4 @@
-GoLab
+GoLab LICENSE
 ===
 
 TODO
