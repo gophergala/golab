@@ -53,6 +53,8 @@ const play_html = `<html>
 	
 	<button id="pauseResume" onclick="pauseResume()">Pause</button>
 	
+	<button id="newGame" onclick="newGame()">New Game</button>
+	
 	<a href="/cheat" target="_blank">Cheat</a>
 </div>
 
@@ -130,6 +132,18 @@ const play_html = `<html>
 		r.onreadystatechange = function() {
 			if (r.readyState == 4 && r.status == 200 && runId != r.responseText)
 				window.location.reload(); // App was restarted, reload page
+		};
+		r.send(null);
+	}
+	
+	function newGame() {
+		var r = new XMLHttpRequest();
+		r.open("GET", "/new?t=" + new Date().getTime(), true);
+		r.onreadystatechange = function() {
+			if (r.readyState == 4 && r.status == 200 && runId != r.responseText)
+				// New game was started, reload page
+				if (!playing)
+					pauseResume();
 		};
 		r.send(null);
 	}

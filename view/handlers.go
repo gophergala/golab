@@ -24,7 +24,7 @@ var playTempl = template.Must(template.New("t").Parse(play_html))
 var labImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, model.LabWidth, model.LabHeight))
 
 // The client's (browser's) view position inside the labyrinth image.
-var ViewPos image.Point
+var Pos image.Point
 
 // init registers the http handlers.
 func init() {
@@ -33,6 +33,7 @@ func init() {
 	http.HandleFunc("/img", imgHandle)
 	http.HandleFunc("/clicked", clickedHandle)
 	http.HandleFunc("/cheat", cheatHandle)
+	http.HandleFunc("/new", newGameHandle)
 }
 
 // InitNew initializes a new game.
@@ -42,7 +43,7 @@ func InitNew() {
 
 	// Draw walls
 	wallImg := image.NewUniform(WallCol)
-	zeroPt := image.Pt(0, 0)
+	zeroPt := image.Point{}
 	for ri, row := range model.Lab {
 		for ci, block := range row {
 			if block == model.BlockWall {
@@ -93,4 +94,13 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 // cheatHandle serves the whole image of the labyrinth
 func cheatHandle(w http.ResponseWriter, r *http.Request) {
 	jpeg.Encode(w, labImg, &jpeg.Options{70})
+}
+
+// newGameHandle signals to start a newgame
+func newGameHandle(w http.ResponseWriter, r *http.Request) {
+	// Use non-blocking send
+	select {
+	case model.NewGameCh <- 1:
+	default:
+	}
 }

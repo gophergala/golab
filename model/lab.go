@@ -3,27 +3,31 @@ package model
 import (
 	"math/rand"
 	"sync"
-	"time"
 )
 
 // Mutex to be used to synchronize model modifications
 var Mutex sync.Mutex
 
 // The model/data of the labyrinth
-var Lab [Rows][Cols]Block
+var Lab [][]Block
 
 // The player's position in the labyrinth in pixel coordinates
 var Pos struct {
 	X, Y float64
 }
 
-func init() {
-	// Initialize random number generator
-	rand.Seed(time.Now().Unix())
-}
+// Channel to signal new game
+var NewGameCh = make(chan int, 1)
 
 // InitNew initializes a new game.
 func InitNew() {
+	Lab = make([][]Block, Rows)
+	for i := range Lab {
+		Lab[i] = make([]Block, Cols)
+	}
+	
+	// Zero value of the labyrinth is full of empty blocks
+
 	// generate labyrinth
 	genLab()
 
@@ -34,13 +38,6 @@ func InitNew() {
 
 // genLab generates a random labyrinth.
 func genLab() {
-	// Zero the labyrinth
-	for _, row := range Lab {
-		for ci := range row {
-			row[ci] = BlockEmpty
-		}
-	}
-
 	// Create a "frame":
 	for ri := range Lab {
 		Lab[ri][0] = BlockWall
@@ -95,7 +92,7 @@ func genLabArea(x1, y1, x2, y2 int) {
 	} else {
 		// Add horizontal split
 		var y int
-		if dy > 6 { // To avoid long straight paths, only use random in small areas
+		if dy > 6 { // To avoid long straight paths, only use random in smaller areas
 			y = midWallPos(y1, y2)
 		} else {
 			y = rWallPos(y1, y2)

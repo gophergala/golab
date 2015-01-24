@@ -39,7 +39,7 @@ func main() {
 		return
 	}
 
-	ctrl.InitNew()
+	ctrl.StartEngine()
 
 	fmt.Printf("Starting GoLab webserver on port %d...\n", port)
 	fmt.Printf("Open http://localhost:%d/\n", port)
