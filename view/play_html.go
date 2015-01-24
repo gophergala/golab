@@ -4,9 +4,11 @@ const play_html = `<html>
 <head>
 <title>{{.Title}}</title>
 <style>
-	body           {padding: 0px; margin: 0px; text-align: center;}
+	body           {padding: 0px; margin: 0px; text-align: center; font-family: Arial;}
+	h3             {padding: 1px; margin: 2px;}
 	#jsRequiredMsg {padding: 3px; margin: 3px; font-weight: bold; background: #faa;}
 	#controls      {padding: 2px;}
+	#controls *    {margin-left: 2px; margin-right: 2px;}
 	#view          {position: relative; padding: 1px;}
 	#img           {background: #000; border: 1px solid black;}
 	#errMsg        {visibility: hidden; position: absolute; top: 10px; right: 0px; width: 100%; color: #ff3030; font-weight: bold;}
@@ -21,9 +23,11 @@ const play_html = `<html>
 	</div>
 </noscript>
 
+<h3>{{.Title}}</h3>
+
 <div id="controls">
 	Quality:
-	<select id="quality">
+	<select id="quality" title="JPEG image quality.">
 		<option value="100">100</option>
 		<option value="90">90</option>
 		<option value="80">80</option>
@@ -38,7 +42,7 @@ const play_html = `<html>
 	</select>
 	
 	FPS:
-	<select id="fps">
+	<select id="fps" title="View refresh rate in Frames Per Second">
 		<option value="33">30</option>
 		<option value="40">25</option>
 		<option value="50" selected>20</option>
@@ -51,11 +55,13 @@ const play_html = `<html>
 		<option value="1000">1</option>
 	</select>
 	
-	<button id="pauseResume" onclick="pauseResume()">Pause</button>
+	<button id="pauseResume" onclick="pauseResume()">Freeze</button>
 	
 	<button id="newGame" onclick="newGame()">New Game</button>
 	
-	<a href="/cheat" target="_blank">Cheat</a>
+	<a href="/cheat" target="_blank" title="Get a glimpse of the whole Labyrinth">Cheat</a>
+	
+	<a href="https://github.com/gophergala/golab" target="_blank" title="Visit Home Page">Home</a>
 </div>
 
 <div id="view">
@@ -89,7 +95,7 @@ const play_html = `<html>
 	function pauseResume() {
 		playing = !playing;
 		imgLoaded = true;
-		pauseResumeBtn.innerText = playing ? "Pause" : "Resume";
+		pauseResumeBtn.innerText = playing ? "Freeze" : "Resume";
 	}
 	
 	function refresh() {
