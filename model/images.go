@@ -14,10 +14,10 @@ import (
 var LabImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
 
 // Gopher images for each direction, each has zero Min point
-var GopherImgs []*image.RGBA = make([]*image.RGBA, DirMax+1)
+var GopherImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
 // Bulldog images for each direction, each has zero Min point
-var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirMax+1)
+var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
 // Image of the wall block
 var WallImg image.Image //= image.NewUniform(WallCol)
@@ -29,7 +29,7 @@ var EmptyImg = image.NewUniform(Black)
 var TargetImg = image.NewUniform(color.RGBA{0xff, 0x10, 0x10, 0xff})
 
 func init() {
-	for i := Dir(0); i <= DirMax; i++ {
+	for i := Dir(0); i < DirLength; i++ {
 		// Load gopher images
 		GopherImgs[i] = loadImg(fmt.Sprintf("w:/gopher-%s.png", i))
 		// Load Bulldog images

@@ -49,7 +49,8 @@ const (
 	DirUp
 	DirDown
 
-	DirMax = DirDown
+	// Not a valid direction: just to tell how many directions are there
+	DirLength
 )
 
 func (d Dir) String() string {

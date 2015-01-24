@@ -52,49 +52,99 @@ func simulate() {
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9
 
-		Gopher := model.Gopher
+		stepMovingObj(model.Gopher, dt)
 
-		x, y := int(Gopher.Pos.X), int(Gopher.Pos.Y)
-
-		moved := false
-
-		// Only horizontal or vertical movement is allowed!
-		if x != Gopher.TargetPos.X {
-			dx := math.Min(dt*model.V, math.Abs(float64(Gopher.TargetPos.X)-Gopher.Pos.X))
-			if x > Gopher.TargetPos.X {
-				dx = -dx
-				Gopher.Direction = model.DirLeft
-			} else {
-				Gopher.Direction = model.DirRight
+		// Move Bulldogs
+		for _, bd := range model.Bulldogs {
+			x, y := int(bd.Pos.X), int(bd.Pos.Y)
+			if bd.TargetPos.X == x && bd.TargetPos.Y == y {
+				row, col := y/model.BlockSize, x/model.BlockSize
+				// Generate new, random target
+				var drow, dcol int
+				dirs := randDirs()
+				for _, dir := range dirs {
+					switch dir {
+					case model.DirLeft:
+						dcol = -1
+					case model.DirRight:
+						dcol = 1
+					case model.DirUp:
+						drow = -1
+					case model.DirDown:
+						drow = 1
+					}
+					if model.Lab[row+drow][col+dcol] == model.BlockEmpty {
+						break
+					}
+					drow, dcol = 0, 0
+				}
+				bd.TargetPos.X += dcol * model.BlockSize
+				bd.TargetPos.Y += drow * model.BlockSize
 			}
-			Gopher.Pos.X += dx
-			moved = true
-		} else if y != Gopher.TargetPos.Y {
-			dy := math.Min(dt*model.V, math.Abs(float64(Gopher.TargetPos.Y)-Gopher.Pos.Y))
-			if y > Gopher.TargetPos.Y {
-				dy = -dy
-				Gopher.Direction = model.DirUp
-			} else {
-				Gopher.Direction = model.DirDown
-			}
-			Gopher.Pos.Y += dy
-			moved = true
-		}
-
-		if moved {
-			// Update lab image
-
-			// Clear gopher image from old pos
-			img := model.GopherImgs[Gopher.Direction]
-
-			b := img.Bounds()
-			rect := img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
-			draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
-
-			// Draw gopher at new position
-			Gopher.DrawImg()
+			stepMovingObj(bd, dt)
 		}
 
 		t = now
 	}
+}
+
+// stepMovingObj steps the specified MovingObj, properly updating the LabImg.
+func stepMovingObj(m *model.MovingObj, dt float64) {
+	x, y := int(m.Pos.X), int(m.Pos.Y)
+
+	moved := false
+
+	// Only horizontal or vertical movement is allowed!
+	if x != m.TargetPos.X {
+		dx := math.Min(dt*model.V, math.Abs(float64(m.TargetPos.X)-m.Pos.X))
+		if x > m.TargetPos.X {
+			dx = -dx
+			m.Direction = model.DirLeft
+		} else {
+			m.Direction = model.DirRight
+		}
+		m.Pos.X += dx
+		moved = true
+	} else if y != m.TargetPos.Y {
+		dy := math.Min(dt*model.V, math.Abs(float64(m.TargetPos.Y)-m.Pos.Y))
+		if y > m.TargetPos.Y {
+			dy = -dy
+			m.Direction = model.DirUp
+		} else {
+			m.Direction = model.DirDown
+		}
+		m.Pos.Y += dy
+		moved = true
+	}
+
+	if moved {
+		// Update lab image
+
+		// Clear image from old pos
+		img := m.Imgs[m.Direction]
+
+		b := img.Bounds()
+		rect := img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
+		draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
+
+		// Draw image at new position
+		m.DrawImg()
+	}
+}
+
+// randDirs returns a slice of Directions in random order.
+func randDirs() []model.Dir {
+	// Create a slice of all Directions
+	s := make([]model.Dir, model.DirLength)
+	for i := model.Dir(0); i < model.DirLength; i++ {
+		s[i] = i
+	}
+
+	// And now shuffle it:
+	for i := len(s) - 1; i > 0; i-- { // last is already random, no use switching with itself
+		r := rand.Intn(i + 1)
+		s[i], s[r] = s[r], s[i]
+	}
+
+	return s
 }

@@ -32,7 +32,7 @@ type MovingObj struct {
 
 // drawImg draws the image of the MovingObj to the LabImg
 func (m *MovingObj) DrawImg() {
-	img := m.Imgs[Gopher.Direction]
+	img := m.Imgs[m.Direction]
 	b := img.Bounds()
 	r := img.Bounds().Add(image.Point{int(m.Pos.X) - b.Dx()/2, int(m.Pos.Y) - b.Dy()/2})
 	draw.Draw(LabImg, r, img, image.Point{}, draw.Src)
@@ -86,13 +86,17 @@ func initBulldogs() {
 	for i := 0; i < len(Bulldogs); i++ {
 		bd := new(MovingObj)
 		Bulldogs[i] = bd
+
 		// Place bulldog at a random position
 		var row, col int
 		// Give some space to Gopher: do not generate Bulldogs too close:
 		for ; row < 5 || col < 5; row, col = rPassPos(0, Rows), rPassPos(0, Cols) {
 		}
+
 		bd.Pos.X = float64(col*BlockSize + BlockSize/2)
 		bd.Pos.Y = float64(row*BlockSize + BlockSize/2)
+
+		bd.TargetPos.X, bd.TargetPos.Y = int(bd.Pos.X), int(bd.Pos.Y)
 		bd.Imgs = BulldogImgs
 	}
 }
