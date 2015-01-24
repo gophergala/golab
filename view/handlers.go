@@ -39,6 +39,19 @@ func init() {
 func InitNew() {
 	// Clear the labyrinth image
 	draw.Draw(labImg, labImg.Bounds(), image.NewUniform(Black), image.Pt(0, 0), draw.Over)
+
+	// Draw walls
+	wallImg := image.NewUniform(WallCol)
+	zeroPt := image.Pt(0, 0)
+	for ri, row := range model.Lab {
+		for ci, block := range row {
+			if block == model.BlockWall {
+				x, y := ci * model.BlockSize, ri * model.BlockSize
+				rect := image.Rect(x, y, x + model.BlockSize, y + model.BlockSize) 
+				draw.Draw(labImg, rect, wallImg, zeroPt, draw.Over)
+			}
+		}
+	}
 }
 
 // playHtmlHandle serves the html page where the user can play.

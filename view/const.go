@@ -17,5 +17,5 @@ const (
 // Color "constants"
 var (
 	Black = color.RGBA{A: 0xff}
-	White = color.RGBA{0xff, 0xff, 0xff, 0xff}
+	WallCol = color.RGBA{0xe0, 0xe0, 0xe0, 0xff}
 )
