@@ -54,13 +54,18 @@ func imgHandle(w http.ResponseWriter, r *http.Request) {
 	if err != nil || quality < 0 || quality > 100 {
 		quality = 70
 	}
-	
+
 	rect := image.Rect(0, 0, params.Width, params.Height)
 	jpeg.Encode(w, model.LabImg.SubImage(rect), &jpeg.Options{quality})
 }
 
 // clickedHandle receives mouse click (mouse button pressed) events with mouse coordinates.
 func clickedHandle(w http.ResponseWriter, r *http.Request) {
+	// If still moving, wait for it:
+	if int(model.Pos.X) != model.TargetPos.X || int(model.Pos.Y) != model.TargetPos.Y {
+		return
+	}
+
 	x, err := strconv.Atoi(r.FormValue("x"))
 	if err != nil {
 		return
@@ -71,7 +76,38 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Clicked:", x, y)
-	model.TargetPos.X, model.TargetPos.Y = x, y
+
+	// Check if new desired target is in the same row/column and if there is a free passage to there.
+	pCol, pRow := int(model.Pos.X)/model.BlockSize, int(model.Pos.Y)/model.BlockSize
+	tCol, tRow := (Pos.X+x)/model.BlockSize, (Pos.Y+y)/model.BlockSize
+
+	sorted := func(a, b int) (int, int) {
+		if a < b {
+			return a, b
+		} else {
+			return b, a
+		}
+	}
+
+	if pCol == tCol { // Same column
+		for row, row2 := sorted(pRow, tRow); row <= row2; row++ {
+			if model.Lab[row][tCol] == model.BlockWall {
+				return // Wall in the route
+			}
+		}
+	} else if pRow == tRow { // Same row
+		for col, col2 := sorted(pCol, tCol); col <= col2; col++ {
+			if model.Lab[tRow][col] == model.BlockWall {
+				return // Wall in the route
+			}
+		}
+	} else {
+		return // Only the same row or column can be commanded
+	}
+
+	// Target pos is allowed and reachable.
+	// Use target position rounded to the center of the target block:
+	model.TargetPos.X, model.TargetPos.Y = tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2
 }
 
 // cheatHandle serves the whole image of the labyrinth
