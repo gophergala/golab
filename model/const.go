@@ -3,21 +3,27 @@ package model
 const (
 	// BlockSize is the size of the labyrinth unit in pixels.
 	BlockSize = 40
+)
 
-	// Rows is the number of rows in the labyrinth
-	Rows = 33
-	// Cols is the number of columns in the labyrinth
-	Cols = 33
+var (
+	// Rows is the number of rows in the Labyrinth
+	Rows int
+	// Cols is the number of columns in the Labyrinth
+	Cols int
 
 	// LabWidth is the width of the labyrinth's image in pixels.
-	LabWidth = Cols * BlockSize
+	LabWidth int
 
 	// LabHeight is the height of the labyrinth's image in pixels.
-	LabHeight = Rows * BlockSize
+	LabHeight int
 )
 
 // V is the moving speed of Gopher and the Buddlogs in pixel/sec.
 var V float64
+
+// "Bulldog density", it tells how many Bulldogs to generate for average of 1,000 blocks.
+// For example if this is 10.0 and rows*cols = 21*21 = 441, 10.0*441/1000 = 4.41 => 4 Bulldogs will be generated.
+var BulldogDensity float64
 
 // Type of the unit of the labyrinth
 type Block int

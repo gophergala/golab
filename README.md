@@ -21,12 +21,21 @@ Of course in the _"Go"_ way using `"go get"`:
 
 The executable binary `golab` (produced by `"go install"`) is _self-contained_: it contains all resources embedded (e.g. images, html templates), nothing else is required for it to run. On startup by default the application opens the UI web page in your default browser.
 
-Configuration
+Configuration and Tweaking
 ---
 
-GoLab can be configured through command line parameters or flags. Execute `golab -h` to see the available command line options and their description. For completeness and for those who didn't install GoLab, here is the output:
+GoLab can be configured and tweaked through command line parameters or flags. Execute `golab -h` to see the available command line options and their description. For completeness and for those who didn't install GoLab, here is the output:
 
-TODO
+    Usage of golab:
+      -autoOpen=true: Auto-opens the UI web page in the default browser
+      -bulldogs=10: the number of Bulldogs in an area of 1,000 Blocks; valid range: 0..50
+      -cols=33: the number of columns in the Labyrinth; must be odd; valid range: 9..99
+      -loopDelay=50: loop delay of the game engine, in milliseconds; valid range: 10..100
+      -port=1234: Port to start the UI web server on; valid range: 0..65535
+      -rows=33: the number of rows in the Labyrinth; must be odd; valid range: 9..99
+      -v=80: moving speed of Gopher and the Bulldogs in pixel/sec; valid range: 20..200
+      -viewHeight=700: height of the view image in pixels in the UI web page; valid range: 150..2000
+      -viewWidth=700: width of the view image in pixels in the UI web page; valid range: 150..2000
 
 Used Packages
 ---

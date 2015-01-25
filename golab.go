@@ -23,38 +23,77 @@ var autoOpen bool
 // processFlags registers flags, parses them and validates them.
 // Returns nil if everything is ok, else an error.
 func processFlags() error {
+
 	// General flags
 	flag.IntVar(&port, "port", 1234, "Port to start the UI web server on; valid range: 0..65535")
 	flag.BoolVar(&autoOpen, "autoOpen", true, "Auto-opens the UI web page in the default browser")
 
-	// Control/Engine flags
-	flag.IntVar(&ctrl.LoopDelay, "loopDelay", 50, "Loop delay of the game engine, in milliseconds; valid range: 10..100")
-	flag.Float64Var(&model.V, "v", model.BlockSize*2.0, "moving speed of Gopher and the Buddlogs in pixel/sec; valid range: 20..200")
+	// Model package flags
+	flag.IntVar(&model.Rows, "rows", 33, "the number of rows in the Labyrinth; must be odd; valid range: 9..99")
+	flag.IntVar(&model.Cols, "cols", 33, "the number of columns in the Labyrinth; must be odd; valid range: 9..99")
+	flag.Float64Var(&model.BulldogDensity, "bulldogs", 10, "the number of Bulldogs in an area of 1,000 Blocks; valid range: 0..50")
 
-	// View flags
-	flag.IntVar(&view.ViewWidth, "viewWidth", 700, "Width of the view image in pixels in the UI web page; valid range: 200..1000")
-	flag.IntVar(&view.ViewHeight, "viewHeight", 700, "Height of the view image in pixels in the UI web page; valid range: 200..1000")
+	// Control/Engine flags
+	flag.IntVar(&ctrl.LoopDelay, "loopDelay", 50, "loop delay of the game engine, in milliseconds; valid range: 10..100")
+	flag.Float64Var(&model.V, "v", model.BlockSize*2.0, "moving speed of Gopher and the Bulldogs in pixel/sec; valid range: 20..200")
+
+	// View package flags
+	flag.IntVar(&view.ViewWidth, "viewWidth", 700, "width of the view image in pixels in the UI web page; valid range: 150..2000")
+	flag.IntVar(&view.ViewHeight, "viewHeight", 700, "height of the view image in pixels in the UI web page; valid range: 150..2000")
 
 	flag.Parse()
 
 	if port < 0 || port > 65535 {
-		return fmt.Errorf("port %d is outside of range 0..65535", port)
+		return fmt.Errorf("port %d is outside of valid range", port)
 	}
 
+	if model.Rows < 9 || model.Rows > 99 {
+		return fmt.Errorf("rows %d is outside of valid range", model.Rows)
+	}
+
+	if model.Cols < 9 || model.Cols > 99 {
+		return fmt.Errorf("cols %d is outside of valid range", model.Cols)
+	}
+
+	if model.Rows&0x01 == 0 {
+		return fmt.Errorf("rows %d must be odd", model.Rows)
+	}
+
+	if model.Cols&0x01 == 0 {
+		return fmt.Errorf("cols %d must be odd", model.Cols)
+	}
+
+	model.LabWidth = model.Cols * model.BlockSize
+	model.LabHeight = model.Rows * model.BlockSize
+
 	if ctrl.LoopDelay < 10 || ctrl.LoopDelay > 100 {
-		return fmt.Errorf("loopDelay %d is outside of range 10..100", ctrl.LoopDelay)
+		return fmt.Errorf("loopDelay %d is outside of valid range", ctrl.LoopDelay)
 	}
 
 	if model.V < 20 || model.V > 200 {
-		return fmt.Errorf("v %f is outside of range 20..200", model.V)
+		return fmt.Errorf("v %f is outside of valid range", model.V)
 	}
 
-	if view.ViewWidth < 200 || view.ViewWidth > 1000 {
-		return fmt.Errorf("viewWidth %d is outside of range 200..1000", view.ViewWidth)
+	if view.ViewWidth < 150 || view.ViewWidth > 2000 {
+		return fmt.Errorf("viewWidth %d is outside of valid range", view.ViewWidth)
 	}
 
-	if view.ViewHeight < 200 || view.ViewHeight > 1000 {
-		return fmt.Errorf("viewHeight %d is outside of range 200..1000", view.ViewHeight)
+	if view.ViewHeight < 150 || view.ViewHeight > 2000 {
+		return fmt.Errorf("viewHeight %d is outside of valid range", view.ViewHeight)
+	}
+
+	if model.BulldogDensity < 0 || model.BulldogDensity > 50 {
+		return fmt.Errorf("bulldogs %f is outside of valid range", model.BulldogDensity)
+	}
+
+	if view.ViewWidth > model.LabWidth {
+		fmt.Printf("Warning: viewWidth is trimmed to cols * %d = %d\n", model.BlockSize, model.LabWidth)
+		view.ViewWidth = model.LabWidth
+	}
+
+	if view.ViewHeight > model.LabHeight {
+		fmt.Printf("Warning: viewHeight is trimmed to rows * %d = %d\n", model.BlockSize, model.LabHeight)
+		view.ViewHeight = model.LabHeight
 	}
 
 	return nil

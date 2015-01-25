@@ -15,7 +15,7 @@ import (
 const useEmbeddedImages = true
 
 // Image of the labyrinth
-var LabImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
+var LabImg *image.RGBA
 
 // Gopher images for each direction, each has zero Min point
 var GopherImgs []*image.RGBA = make([]*image.RGBA, DirLength)

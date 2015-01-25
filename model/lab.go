@@ -65,7 +65,7 @@ var Won bool
 var TargetPoss = make([]image.Point, 0, 20)
 
 // Slice of Bulldogs, the ancient enemy of Gophers.
-var Bulldogs = make([]*MovingObj, Rows*Cols/100)
+var Bulldogs []*MovingObj
 
 // Exit position
 var ExitPos = image.Point{}
@@ -90,6 +90,10 @@ var ClickCh = make(chan Click, 10)
 
 // InitNew initializes a new game.
 func InitNew() {
+	LabImg = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
+
+	Bulldogs = make([]*MovingObj, int(float64(Rows*Cols)*BulldogDensity/1000))
+
 	Dead = false
 	Won = false
 
