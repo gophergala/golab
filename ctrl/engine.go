@@ -60,9 +60,13 @@ func simulate() {
 			if bd.TargetPos.X == x && bd.TargetPos.Y == y {
 				row, col := y/model.BlockSize, x/model.BlockSize
 				// Generate new, random target
+				// Shuffle the directions slice:
+				for i := len(directions) - 1; i > 0; i-- { // last is already random, no use switching with itself
+					r := rand.Intn(i + 1)
+					directions[i], directions[r] = directions[r], directions[i]
+				}
 				var drow, dcol int
-				dirs := randDirs()
-				for _, dir := range dirs {
+				for _, dir := range directions {
 					switch dir {
 					case model.DirLeft:
 						dcol = -1
@@ -74,6 +78,11 @@ func simulate() {
 						drow = 1
 					}
 					if model.Lab[row+drow][col+dcol] == model.BlockEmpty {
+						// Direction is good, check if we can even step this way 2 blocks:
+						if model.Lab[row+drow*2][col+dcol*2] == model.BlockEmpty {
+							drow *= 2
+							dcol *= 2
+						}
 						break
 					}
 					drow, dcol = 0, 0
@@ -132,19 +141,12 @@ func stepMovingObj(m *model.MovingObj, dt float64) {
 	}
 }
 
-// randDirs returns a slice of Directions in random order.
-func randDirs() []model.Dir {
-	// Create a slice of all Directions
-	s := make([]model.Dir, model.DirLength)
+// directions is a reused slice of all directions
+var directions = make([]model.Dir, model.DirLength)
+
+func init() {
+	// Populate the directions slice
 	for i := model.Dir(0); i < model.DirLength; i++ {
-		s[i] = i
+		directions[i] = i
 	}
-
-	// And now shuffle it:
-	for i := len(s) - 1; i > 0; i-- { // last is already random, no use switching with itself
-		r := rand.Intn(i + 1)
-		s[i], s[r] = s[r], s[i]
-	}
-
-	return s
 }

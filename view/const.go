@@ -5,7 +5,7 @@ const AppTitle = "Gopher's Labyrinth - First Gopher Gala (2015)"
 
 const (
 	// Width of the client view in pixels
-	ViewWidth = 600
+	ViewWidth = 700
 	// Width of the client view in pixels
-	ViewHeight = 600
+	ViewHeight = 700
 )

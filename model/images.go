@@ -36,7 +36,7 @@ func init() {
 		BulldogImgs[i] = loadImg(fmt.Sprintf("w:/bulldog-%s.png", i))
 	}
 
-	WallImg = loadImg("w:/wall.png")
+	WallImg = loadImg("w:/wall5.png")
 }
 
 // loadImg loads a PNG image from the specified file, and converts it to image.RGBA and makes sure image has zero Min point.
