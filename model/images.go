@@ -16,6 +16,8 @@ var LabImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
 // Gopher images for each direction, each has zero Min point
 var GopherImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
+var GopherDeadImg *image.RGBA
+
 // Bulldog images for each direction, each has zero Min point
 var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
@@ -26,7 +28,7 @@ var WallImg *image.RGBA
 var EmptyImg = image.NewUniform(Black)
 
 // Image of the empty block
-var TargetImg = image.NewUniform(color.RGBA{0xff, 0x10, 0x10, 0xff})
+var TargetImg = image.NewUniform(color.RGBA{0x00, 0xff, 0x00, 0xff})
 
 func init() {
 	for i := Dir(0); i < DirLength; i++ {
@@ -37,6 +39,8 @@ func init() {
 	}
 
 	WallImg = loadImg("w:/wall5.png")
+
+	GopherDeadImg = loadImg("w:/gopher-dead.png")
 }
 
 // loadImg loads a PNG image from the specified file, and converts it to image.RGBA and makes sure image has zero Min point.

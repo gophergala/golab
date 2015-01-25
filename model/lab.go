@@ -30,24 +30,27 @@ type MovingObj struct {
 	Imgs []*image.RGBA
 }
 
-// drawImg draws the image of the MovingObj to the LabImg.
+// DrawImg draws the image of the MovingObj to the LabImg.
 func (m *MovingObj) DrawImg() {
-	m.drawImg(m.Imgs[m.Direction])
+	m.DrawWithImg(m.Imgs[m.Direction])
 }
 
 // EraseImg erases the image of the MovingObj from the LabImg by drawing empty block to it.
 func (m *MovingObj) EraseImg() {
-	m.drawImg(EmptyImg)
+	m.DrawWithImg(EmptyImg)
 }
 
-// EraseImg erases the image of the MovingObj from the LabImg by drawing empty block to it.
-func (m *MovingObj) drawImg(img image.Image) {
+// DrawWithImage draws the specified image at the position of the moving object onto the LabImg.
+func (m *MovingObj) DrawWithImg(img image.Image) {
 	r := image.Rect(0, 0, BlockSize, BlockSize).Add(image.Point{int(m.Pos.X) - BlockSize/2, int(m.Pos.Y) - BlockSize/2})
 	draw.Draw(LabImg, r, img, image.Point{}, draw.Over)
 }
 
 // Gopher is our hero, the moving object the user can control.
 var Gopher = new(MovingObj)
+
+// Dead tells if Gopher died
+var Dead bool
 
 // For Gopher we maintain multiple target positions which define a path on which Gopher will move along
 var TargetPoss = make([]image.Point, 0, 10)
@@ -75,6 +78,8 @@ var ClickCh = make(chan Click, 10)
 
 // InitNew initializes a new game.
 func InitNew() {
+	Dead = false
+
 	initLab()
 
 	initGopher()

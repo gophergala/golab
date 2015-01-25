@@ -64,8 +64,10 @@ func simulate() {
 			bd.EraseImg()
 		}
 
-		// Draw target positions
-		eraseDrawTargetPoss(false)
+		if !model.Dead {
+			// Draw target positions
+			eraseDrawTargetPoss(false)
+		}
 
 		now := time.Now().UnixNano()
 		dt = float64(now-t) / 1e9
@@ -90,6 +92,10 @@ func simulate() {
 
 // handleClick handles a mouse click
 func handleClick(c model.Click) {
+	if model.Dead {
+		return
+	}
+
 	Gopher := model.Gopher
 
 	if c.Btn == model.MouseBtnRight {
@@ -168,6 +174,11 @@ func eraseDrawTargetPoss(erase bool) {
 func stepGopher() {
 	Gopher := model.Gopher
 
+	if model.Dead {
+		Gopher.DrawWithImg(model.GopherDeadImg)
+		return
+	}
+
 	// Check if reached current target position:
 	if int(Gopher.Pos.X) == Gopher.TargetPos.X && int(Gopher.Pos.Y) == Gopher.TargetPos.Y {
 		// Check if we have more target positions in our path:
@@ -185,6 +196,9 @@ func stepGopher() {
 
 // stepBulldogs iterates over all Bulldogs, generates new random target if they reached their current, and steps them.
 func stepBulldogs() {
+	// Gopher's position:
+	gpos := model.Gopher.Pos
+
 	for _, bd := range model.Bulldogs {
 		x, y := int(bd.Pos.X), int(bd.Pos.Y)
 
@@ -228,7 +242,19 @@ func stepBulldogs() {
 		}
 
 		stepMovingObj(bd)
+
+		if !model.Dead {
+			// Check if this Bulldog reached Gopher
+			if math.Abs(gpos.X-bd.Pos.X) < model.BlockSize*0.75 && math.Abs(gpos.Y-bd.Pos.Y) < model.BlockSize*0.75 {
+				processDying()
+			}
+		}
 	}
+}
+
+// processDying processes the event of Gopher death.
+func processDying() {
+	model.Dead = true
 }
 
 // stepMovingObj steps the specified MovingObj and draws its image to its new position onto the LabImg.
