@@ -11,11 +11,12 @@ import (
 	"time"
 )
 
-var params = struct {
+var Params = struct {
 	Title         string
 	Width, Height int
 	RunId         int64
-}{AppTitle, ViewWidth, ViewHeight, time.Now().Unix()}
+	ShowFreezeBtn bool
+}{AppTitle, ViewWidth, ViewHeight, time.Now().Unix(), false}
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 
@@ -39,13 +40,13 @@ func InitNew() {
 
 // playHtmlHandle serves the html page where the user can play.
 func playHtmlHandle(w http.ResponseWriter, r *http.Request) {
-	playTempl.Execute(w, params)
+	playTempl.Execute(w, Params)
 }
 
 // runidHandle serves the running app id which changes if app is restarted
 // (so browser clients can detect if app was restarted).
 func runIdHandle(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%d", params.RunId)
+	fmt.Fprintf(w, "%d", Params.RunId)
 }
 
 // imgHandle serves images of the player's view.

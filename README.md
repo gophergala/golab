@@ -21,6 +21,13 @@ Of course in the _"Go"_ way using `"go get"`:
 
 The executable binary `golab` (produced by `"go install"`) contains all resources embedded (e.g. images, html templates), nothing else is required for it to run.
 
+Configuration
+---
+
+GoLab can be configured through command line parameters or flags. Execute `golab -h` to see the available command line options and their description.
+
+TODO
+
 Implementation
 ---
 
@@ -33,7 +40,8 @@ Used packages from the standard library and their utilisation:
 - [image/png](http://golang.org/pkg/image/png/) is used to read image resources of the game
 - [image/jpeg](http://golang.org/pkg/image/jpeg/) is used to generate the view of the game (labyrinth) for HTTP clients (browsers)
 - [html/template](http://golang.org/pkg/html/template/) package is used to generate the UI web page
-- TODO Base64
+- [encoding/base64](http://golang.org/pkg/encoding/base64/) package is used to generate and decode embedded image resources to/form Base64 strings
+- [flag](http://golang.org/pkg/flag/) package is used to enable basic configuration through the command line
 
 Usefulness
 ---

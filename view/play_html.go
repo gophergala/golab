@@ -12,6 +12,7 @@ const play_html = `<html>
 	#view          {position: relative; padding: 1px;}
 	#img           {background: #000; border: 1px solid black;}
 	#errMsg        {visibility: hidden; position: absolute; top: 10px; right: 0px; width: 100%; color: #ff3030; font-weight: bold;}
+	#footer        {padding: 5px; font-size: 90%; font-style: italic;}
 </style>
 </head>
 
@@ -54,13 +55,14 @@ const play_html = `<html>
 		<option value="1000">1</option>
 	</select>
 	
-	<button id="pauseResume" onclick="pauseResume()" title="Stops refreshing the view but does not pauses the game">Freeze</button>
+	<button id="pauseResume" onclick="pauseResume()" {{if not .ShowFreezeBtn}}style="display: none"{{end}} 
+		title="Stops refreshing the view but does not pauses the game">Freeze</button>
 	
 	<button id="newGame" onclick="newGame()">New Game</button>
 	
 	<a href="/cheat" target="_blank" title="Get a glimpse of the whole Labyrinth">Cheat</a>
 	
-	<a href="https://github.com/gophergala/golab" target="_blank" title="Visit Home Page">Home</a>
+	<a href="https://github.com/gophergala/golab" target="_blank" title="Visit Home Page">Home page</a>
 </div>
 
 <div id="view">
@@ -69,6 +71,10 @@ const play_html = `<html>
 		onerror="errMsg.style.visibility = 'visible'; setTimeout('imgLoaded = true;', 1000);"
 		onmousedown="imgClicked(event)"/>
 	<div id="errMsg">Connection Error or Application Closed!</div>
+</div>
+
+<div id="footer">
+	Copyright &copy; 2015 Andras Belicza. All rights reserved. <a href="https://github.com/gophergala/golab/blob/master/LICENSE.md" target="_blank">LICENSE</a>
 </div>
 
 <script>

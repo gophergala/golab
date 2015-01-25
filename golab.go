@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gophergala/golab/ctrl"
+	"github.com/gophergala/golab/view"
 	"log"
 	"net/http"
 	"runtime"
@@ -17,6 +18,7 @@ var port int
 // Returns nil if everything is ok, else an error.
 func processFlags() error {
 	flag.IntVar(&port, "port", 1234, "Port to start the UI web server on; valid range: 0..65535")
+	flag.BoolVar(&view.Params.ShowFreezeBtn, "showFreeze", false, "Show the \"Freeze\" button in the HTML page which stops refreshing the view")
 
 	flag.Parse()
 
