@@ -49,6 +49,9 @@ func (m *MovingObj) drawImg(img image.Image) {
 // Gopher is our hero, the moving object the user can control.
 var Gopher = new(MovingObj)
 
+// For Gopher we maintain multiple target positions which define a path on which Gopher will move along
+var TargetPoss = make([]image.Point, 0, 10)
+
 // Slice of Bulldogs, the ancient enemy of Gophers.
 var Bulldogs = make([]*MovingObj, Rows*Cols/100)
 
@@ -96,6 +99,9 @@ func initGopher() {
 	Gopher.Direction = DirRight
 	Gopher.TargetPos.X, Gopher.TargetPos.Y = int(Gopher.Pos.X), int(Gopher.Pos.Y)
 	Gopher.Imgs = GopherImgs
+
+	// Throw away queued targets
+	TargetPoss = TargetPoss[0:0]
 }
 
 // initBulldogs creates and initializes the Bulldogs.

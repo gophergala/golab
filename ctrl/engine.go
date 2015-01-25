@@ -28,6 +28,9 @@ func StartEngine() {
 	go simulate()
 }
 
+// Delta time since our last iteration
+var dt float64
+
 // simulate implements the game cycle
 func simulate() {
 	t := time.Now().UnixNano()
@@ -57,51 +60,16 @@ func simulate() {
 			bd.EraseImg()
 		}
 
+		// Draw target positions
+		drawTargetPoss()
+
 		now := time.Now().UnixNano()
-		dt := float64(now-t) / 1e9
+		dt = float64(now-t) / 1e9
 
 		// Now step moving objects
 
-		stepMovingObj(model.Gopher, dt)
-
-		// Move Bulldogs
-		for _, bd := range model.Bulldogs {
-			x, y := int(bd.Pos.X), int(bd.Pos.Y)
-			if bd.TargetPos.X == x && bd.TargetPos.Y == y {
-				row, col := y/model.BlockSize, x/model.BlockSize
-				// Generate new, random target
-				// Shuffle the directions slice:
-				for i := len(directions) - 1; i > 0; i-- { // last is already random, no use switching with itself
-					r := rand.Intn(i + 1)
-					directions[i], directions[r] = directions[r], directions[i]
-				}
-				var drow, dcol int
-				for _, dir := range directions {
-					switch dir {
-					case model.DirLeft:
-						dcol = -1
-					case model.DirRight:
-						dcol = 1
-					case model.DirUp:
-						drow = -1
-					case model.DirDown:
-						drow = 1
-					}
-					if model.Lab[row+drow][col+dcol] == model.BlockEmpty {
-						// Direction is good, check if we can even step this way 2 blocks:
-						if model.Lab[row+drow*2][col+dcol*2] == model.BlockEmpty {
-							drow *= 2
-							dcol *= 2
-						}
-						break
-					}
-					drow, dcol = 0, 0
-				}
-				bd.TargetPos.X += dcol * model.BlockSize
-				bd.TargetPos.Y += drow * model.BlockSize
-			}
-			stepMovingObj(bd, dt)
-		}
+		stepGopher()
+		stepBulldogs()
 
 		t = now
 
@@ -120,15 +88,25 @@ func simulate() {
 func handleClick(c model.Click) {
 	Gopher := model.Gopher
 
-	// If still moving, wait for it:
-	if int(Gopher.Pos.X) != Gopher.TargetPos.X || int(Gopher.Pos.Y) != Gopher.TargetPos.Y {
+	// If target buffer is full, do nothing:
+	// int(Gopher.Pos.X) != Gopher.TargetPos.X || int(Gopher.Pos.Y) != Gopher.TargetPos.Y
+	if len(model.TargetPoss) == cap(model.TargetPoss) {
 		return
 	}
 
-	// Check if new desired target is in the same row/column and if there is a free passage to there.
-	pCol, pRow := int(Gopher.Pos.X)/model.BlockSize, int(Gopher.Pos.Y)/model.BlockSize
+	// Last target pos:
+	var TargetPos image.Point
+	if len(model.TargetPoss) == 0 {
+		TargetPos = Gopher.TargetPos
+	} else {
+		TargetPos = model.TargetPoss[len(model.TargetPoss)-1]
+	}
+
+	// Check if new desired target is in the same row/column as the last target and if there is a free passage to there.
+	pCol, pRow := TargetPos.X/model.BlockSize, TargetPos.Y/model.BlockSize
 	tCol, tRow := c.X/model.BlockSize, c.Y/model.BlockSize
 
+	// sorted simply returns its parameters in ascendant order:
 	sorted := func(a, b int) (int, int) {
 		if a < b {
 			return a, b
@@ -155,18 +133,93 @@ func handleClick(c model.Click) {
 
 	// Target pos is allowed and reachable.
 	// Use target position rounded to the center of the target block:
-	Gopher.TargetPos.X, Gopher.TargetPos.Y = tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2
+	model.TargetPoss = append(model.TargetPoss, image.Pt(tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2))
+}
 
-	// Mark target position visually for the player if it is not the current block:
-	if pRow != tRow || pCol != tCol {
+// drawTargetPoss draws target positions of Gopher, both the current and the buffered ones.
+func drawTargetPoss() {
+	// dtp: drawTargetPos
+	dtp := func(TargetPos image.Point) {
 		rect := image.Rect(0, 0, model.BlockSize/4, model.BlockSize/4)
-		rect = rect.Add(image.Pt(Gopher.TargetPos.X-rect.Dx()/2, Gopher.TargetPos.Y-rect.Dy()/2))
+		rect = rect.Add(image.Pt(TargetPos.X-rect.Dx()/2, TargetPos.Y-rect.Dy()/2))
 		draw.Draw(model.LabImg, rect, model.TargetImg, image.Point{}, draw.Over)
+	}
+
+	dtp(model.Gopher.TargetPos)
+	for _, TargetPos := range model.TargetPoss {
+		dtp(TargetPos)
 	}
 }
 
-// stepMovingObj steps the specified MovingObj, properly updating the LabImg.
-func stepMovingObj(m *model.MovingObj, dt float64) {
+// stepGopher handles moving the Gopher and also handles the multiple target positions of Gopher.
+func stepGopher() {
+	Gopher := model.Gopher
+
+	// Check if reached current target position:
+	if int(Gopher.Pos.X) == Gopher.TargetPos.X && int(Gopher.Pos.Y) == Gopher.TargetPos.Y {
+		// Check if we have more target positions in our path:
+		if len(model.TargetPoss) > 0 {
+			// Set the next target as the current
+			Gopher.TargetPos = model.TargetPoss[0]
+			// and remove it from the targets:
+			model.TargetPoss = model.TargetPoss[:copy(model.TargetPoss, model.TargetPoss[1:])]
+		}
+	}
+
+	// Step Gopher
+	stepMovingObj(Gopher)
+}
+
+// stepBulldogs iterates over all Bulldogs, generates new random target if they reached their current, and steps them.
+func stepBulldogs() {
+	for _, bd := range model.Bulldogs {
+		x, y := int(bd.Pos.X), int(bd.Pos.Y)
+
+		if bd.TargetPos.X == x && bd.TargetPos.Y == y {
+			row, col := y/model.BlockSize, x/model.BlockSize
+			// Generate new, random target.
+			// For this we shuffle all the directions, and check them sequentially.
+			// Firts one in which direction there is a free path wins (such path surely exists).
+
+			// Shuffle the directions slice:
+			for i := len(directions) - 1; i > 0; i-- { // last is already random, no use switching with itself
+				r := rand.Intn(i + 1)
+				directions[i], directions[r] = directions[r], directions[i]
+			}
+
+			var drow, dcol int
+			for _, dir := range directions {
+				switch dir {
+				case model.DirLeft:
+					dcol = -1
+				case model.DirRight:
+					dcol = 1
+				case model.DirUp:
+					drow = -1
+				case model.DirDown:
+					drow = 1
+				}
+				if model.Lab[row+drow][col+dcol] == model.BlockEmpty {
+					// Direction is good, check if we can even step 2 bocks in this way:
+					if model.Lab[row+drow*2][col+dcol*2] == model.BlockEmpty {
+						drow *= 2
+						dcol *= 2
+					}
+					break
+				}
+				drow, dcol = 0, 0
+			}
+
+			bd.TargetPos.X += dcol * model.BlockSize
+			bd.TargetPos.Y += drow * model.BlockSize
+		}
+
+		stepMovingObj(bd)
+	}
+}
+
+// stepMovingObj steps the specified MovingObj and draws its image to its new position onto the LabImg.
+func stepMovingObj(m *model.MovingObj) {
 	x, y := int(m.Pos.X), int(m.Pos.Y)
 
 	// Only horizontal or vertical movement is allowed!
