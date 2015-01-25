@@ -1,4 +1,7 @@
 These resources are not required at runtime, they are embedded into the executable binary.
+Whether the embedded images are used is controlled by the useEmbeddedImages constant/variable in model/images.go file.
+If it is set to false, these images are searched for in the current directory.
+
 
 Original Gopher image from:
 https://github.com/golang-samples/gopher-vector
