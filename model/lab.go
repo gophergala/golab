@@ -55,6 +55,15 @@ var Bulldogs = make([]*MovingObj, Rows*Cols/100)
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
 
+// Click describes a mouse click.
+type Click struct {
+	// X, Y are the mouse coordinates in pixel, in the coordinate system of the Labyrinth
+	X, Y int
+}
+
+// Channel to receive mouse clicks on (view package sends, ctrl package (engine) processes them)
+var ClickCh = make(chan Click, 10)
+
 // InitNew initializes a new game.
 func InitNew() {
 	initLab()
