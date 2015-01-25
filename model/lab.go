@@ -30,12 +30,20 @@ type MovingObj struct {
 	Imgs []*image.RGBA
 }
 
-// drawImg draws the image of the MovingObj to the LabImg
+// drawImg draws the image of the MovingObj to the LabImg.
 func (m *MovingObj) DrawImg() {
-	img := m.Imgs[m.Direction]
-	b := img.Bounds()
-	r := img.Bounds().Add(image.Point{int(m.Pos.X) - b.Dx()/2, int(m.Pos.Y) - b.Dy()/2})
-	draw.Draw(LabImg, r, img, image.Point{}, draw.Src)
+	m.drawImg(m.Imgs[m.Direction])
+}
+
+// EraseImg erases the image of the MovingObj from the LabImg by drawing empty block to it.
+func (m *MovingObj) EraseImg() {
+	m.drawImg(EmptyImg)
+}
+
+// EraseImg erases the image of the MovingObj from the LabImg by drawing empty block to it.
+func (m *MovingObj) drawImg(img image.Image) {
+	r := image.Rect(0, 0, BlockSize, BlockSize).Add(image.Point{int(m.Pos.X) - BlockSize/2, int(m.Pos.Y) - BlockSize/2})
+	draw.Draw(LabImg, r, img, image.Point{}, draw.Over)
 }
 
 // Gopher is our hero, the moving object the user can control.
@@ -116,14 +124,6 @@ func initLabImg() {
 				draw.Draw(LabImg, rect, WallImg, zeroPt, draw.Over)
 			}
 		}
-	}
-
-	// Draw first gopher image
-	Gopher.DrawImg()
-
-	// Draw first bulldog images
-	for _, bd := range Bulldogs {
-		bd.DrawImg()
 	}
 }
 

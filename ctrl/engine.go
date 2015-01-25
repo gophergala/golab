@@ -3,8 +3,6 @@ package ctrl
 import (
 	"github.com/gophergala/golab/model"
 	"github.com/gophergala/golab/view"
-	"image"
-	"image/draw"
 	"math"
 	"math/rand"
 	"time"
@@ -40,17 +38,16 @@ func simulate() {
 		default:
 		}
 
-		// Sleep some time.
-		// Iterations might not be exact, but we don't rely on it:
-		// We calculate delta time and calculate moving and next positions
-		// based on the delta time.
-
-		model.Mutex.Unlock()              // While sleeping, clients can request view images
-		time.Sleep(time.Millisecond * 50) // ~20 FPS
-		model.Mutex.Lock()                // We will modify model now, labyrinth image might change so lock.
+		// First clear moving objects from the lab image:
+		model.Gopher.EraseImg()
+		for _, bd := range model.Bulldogs {
+			bd.EraseImg()
+		}
 
 		now := time.Now().UnixNano()
 		dt := float64(now-t) / 1e9
+
+		// Now step moving objects
 
 		stepMovingObj(model.Gopher, dt)
 
@@ -94,14 +91,21 @@ func simulate() {
 		}
 
 		t = now
+		
+		// Sleep some time.
+		// Iterations might not be exact, but we don't rely on it:
+		// We calculate delta time and calculate moving and next positions
+		// based on the delta time.
+
+		model.Mutex.Unlock()              // While sleeping, clients can request view images
+		time.Sleep(time.Millisecond * 50) // ~20 FPS
+		model.Mutex.Lock()                // We will modify model now, labyrinth image might change so lock.
 	}
 }
 
 // stepMovingObj steps the specified MovingObj, properly updating the LabImg.
 func stepMovingObj(m *model.MovingObj, dt float64) {
 	x, y := int(m.Pos.X), int(m.Pos.Y)
-
-	moved := false
 
 	// Only horizontal or vertical movement is allowed!
 	if x != m.TargetPos.X {
@@ -113,7 +117,6 @@ func stepMovingObj(m *model.MovingObj, dt float64) {
 			m.Direction = model.DirRight
 		}
 		m.Pos.X += dx
-		moved = true
 	} else if y != m.TargetPos.Y {
 		dy := math.Min(dt*model.V, math.Abs(float64(m.TargetPos.Y)-m.Pos.Y))
 		if y > m.TargetPos.Y {
@@ -123,22 +126,10 @@ func stepMovingObj(m *model.MovingObj, dt float64) {
 			m.Direction = model.DirDown
 		}
 		m.Pos.Y += dy
-		moved = true
 	}
 
-	if moved {
-		// Update lab image
-
-		// Clear image from old pos
-		img := m.Imgs[m.Direction]
-
-		b := img.Bounds()
-		rect := img.Bounds().Add(image.Pt(x-b.Dx()/2, y-b.Dy()/2))
-		draw.Draw(model.LabImg, rect, model.EmptyImg, image.Point{}, draw.Over)
-
-		// Draw image at new position
-		m.DrawImg()
-	}
+	// Draw image at new position
+	m.DrawImg()
 }
 
 // directions is a reused slice of all directions

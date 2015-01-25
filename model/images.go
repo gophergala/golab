@@ -20,7 +20,7 @@ var GopherImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
 // Image of the wall block
-var WallImg image.Image //= image.NewUniform(WallCol)
+var WallImg *image.RGBA
 
 // Image of the empty block
 var EmptyImg = image.NewUniform(Black)
