@@ -62,7 +62,7 @@ var Dead bool
 var Won bool
 
 // For Gopher we maintain multiple target positions which define a path on which Gopher will move along
-var TargetPoss = make([]image.Point, 0, 10)
+var TargetPoss = make([]image.Point, 0, 20)
 
 // Slice of Bulldogs, the ancient enemy of Gophers.
 var Bulldogs = make([]*MovingObj, Rows*Cols/100)
