@@ -13,10 +13,10 @@ import (
 
 var Params = struct {
 	Title         string
-	Width, Height int
+	Width, Height *int
 	RunId         int64
 	ShowFreezeBtn bool
-}{AppTitle, ViewWidth, ViewHeight, time.Now().Unix(), false}
+}{AppTitle, &ViewWidth, &ViewHeight, time.Now().Unix(), false}
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 

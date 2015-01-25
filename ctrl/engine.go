@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+// LoopDelay is the delay between the iterations of the main loop of the game engine, in milliseconds.
+var LoopDelay = 50 // ~20 FPS
+
 // InitNew initializes a new game.
 func initNew() {
 	// Initialize random number generator
@@ -98,8 +101,8 @@ func simulate() {
 			// Send back value to detect it at the proper place
 			model.NewGameCh <- 1
 		}
-		time.Sleep(time.Millisecond * 50) // ~20 FPS
-		model.Mutex.Lock()                // We will modify model now, labyrinth image might change so lock.
+		time.Sleep(time.Millisecond * time.Duration(LoopDelay))
+		model.Mutex.Lock() // We will modify model now, labyrinth image might change so lock.
 	}
 }
 

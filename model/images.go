@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	"image/color"
 	"image/draw"
 	"image/png"
 	"io/ioutil"
@@ -30,7 +31,7 @@ var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 var WallImg *image.RGBA
 
 // Image of the empty block
-var EmptyImg = image.NewUniform(Black)
+var EmptyImg = image.NewUniform(color.RGBA{A: 0xff})
 
 // Image of the empty block
 var TargetImg *image.RGBA

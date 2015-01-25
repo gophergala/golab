@@ -52,9 +52,9 @@ As mentioned earlier, everything is calculated and stored in the (Go) applicatio
 
 The `model` package defines the basic types and data structures of the game. The `view` package is responsible for the UI of the game. The UI is a thin HTML layer, it contains an HTML page with some embedded JavaScript. No external JavaScript libraries are used, everything is "self-made". At the GoLab "side" the `net/http` package is used to serve the HTTP clients (browsers).
 
-The `ctrl` package is the controller or the _engine_ of the game, it implements all the game logic. It runs in an endless loop, and processes events from the UI client, performs calculation of moving objects and updates the image / view of the Labyrinth.
+The `ctrl` package is the controller or the _engine_ of the game, it implements all the game logic. It runs in an endless loop, and processes events from the UI client(s), performs calculation of moving objects, performs certain checks (like winning and dying) and updates the image / view of the Labyrinth.
 
-Since there might be multiple goroutines running parallel, communication between the `view` and the `ctrl/model` is done via channels. Also to prevent incomplete/flickering images sent to the clients, the engine performs explicit "model" locking while the next phase of the game is calculated. 
+Since there might be multiple goroutines running parallel, communication between the `view` and the `ctrl/model` is done via channels. Also to prevent incomplete/flickering images sent to the clients, the engine performs explicit "model" locking while the next phase of the game is being calculated. 
 
 **Communication between the (Go) application and the browser (UI):**
 
@@ -65,8 +65,10 @@ Since there might be multiple goroutines running parallel, communication between
 - Clicks on the view image is detected by JavaScript code and are sent back to the server via AJAX calls. The server processes them.
 - Quality is a parameter which is attached to the image urls when the view is requested.
 - The FPS parameter is just used at the client side to time image refreshing.
-- New Game request is also sent in an AJAX call.
+- New Game requests are also sent via AJAX calls.
 - The Cheat link opens a new browser tab directed to a URL whose handler sends a snapshot image of the whole Labyrinth.
+- The web page constantly monitors the application, and if the application is closed or network error occurs, proper notification/error messages are displayed to the user. The web page automatically "reconnects" if the application becomes available again.
+- The web page also automatically detects if the application is restarted, and in this case will reload itself. 
 
 Usefulness
 ---

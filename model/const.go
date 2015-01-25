@@ -1,9 +1,5 @@
 package model
 
-import (
-	"image/color"
-)
-
 const (
 	// BlockSize is the size of the labyrinth unit in pixels.
 	BlockSize = 40
@@ -20,8 +16,8 @@ const (
 	LabHeight = Rows * BlockSize
 )
 
-// V is the moving speed of Gopher in pixel/sec.
-const V = BlockSize * 2.0
+// V is the moving speed of Gopher and the Buddlogs in pixel/sec.
+var V float64
 
 // Type of the unit of the labyrinth
 type Block int
@@ -32,12 +28,6 @@ const (
 	BlockEmpty Block = iota
 	// Wall block
 	BlockWall
-)
-
-// Color "constants"
-var (
-	Black   = color.RGBA{A: 0xff}
-	WallCol = color.RGBA{0xe0, 0xe0, 0xe0, 0xff}
 )
 
 type Dir int

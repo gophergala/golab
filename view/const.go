@@ -3,9 +3,9 @@ package view
 // Title as the application - as it appears in the Browser title
 const AppTitle = "Gopher's Labyrinth - First Gopher Gala (2015)"
 
-const (
+var (
 	// Width of the client view in pixels
-	ViewWidth = 700
+	ViewWidth int
 	// Width of the client view in pixels
-	ViewHeight = 700
+	ViewHeight int
 )
