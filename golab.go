@@ -1,5 +1,7 @@
 // Package main of GoLab is the main package defining the entry point
 // and which compiles into the GoLab executable.
+//
+// Home page: https://github.com/gophergala/golab
 package main
 
 import (

@@ -12,7 +12,7 @@ const play_html = `<html>
 	#view          {position: relative; padding: 1px;}
 	#img           {background: #000; border: 1px solid black;}
 	#errMsg        {visibility: hidden; position: absolute; top: 10px; right: 0px; width: 100%; color: #ff3030; font-weight: bold;}
-	#footer        {padding: 5px; font-size: 90%; font-style: italic;}
+	#footer        {margin-top: 5px; font-size: 90%; font-style: italic;}
 </style>
 </head>
 
@@ -59,6 +59,8 @@ const play_html = `<html>
 		title="Stops refreshing the view but does not pauses the game">Freeze</button>
 	
 	<button id="newGame" onclick="newGame()">New Game</button>
+	
+	<a href="/help" target="_blank">Help</a>
 	
 	<a href="/cheat" target="_blank" title="Get a glimpse of the whole Labyrinth">Cheat</a>
 	

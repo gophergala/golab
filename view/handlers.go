@@ -18,7 +18,11 @@ var Params = struct {
 	ShowFreezeBtn bool
 }{AppTitle, &ViewWidth, &ViewHeight, time.Now().Unix(), false}
 
+// Template of the play html page
 var playTempl = template.Must(template.New("t").Parse(play_html))
+
+// Template of the help html page
+var helpTempl = template.Must(template.New("t").Parse(help_html))
 
 // The client's (browser's) view position inside the Labyrinth image. This is the top-left point of the view.
 var Pos image.Point
@@ -31,6 +35,7 @@ func init() {
 	http.HandleFunc("/clicked", clickedHandle)
 	http.HandleFunc("/cheat", cheatHandle)
 	http.HandleFunc("/new", newGameHandle)
+	http.HandleFunc("/help", helpHtmlHandle)
 }
 
 // InitNew initializes a new game.
@@ -121,4 +126,9 @@ func newGameHandle(w http.ResponseWriter, r *http.Request) {
 	case model.NewGameCh <- 1:
 	default:
 	}
+}
+
+// helpHtmlHandle serves the help html page.
+func helpHtmlHandle(w http.ResponseWriter, r *http.Request) {
+	helpTempl.Execute(w, Params)
 }
