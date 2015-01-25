@@ -19,7 +19,7 @@ var params = struct {
 
 var playTempl = template.Must(template.New("t").Parse(play_html))
 
-// The client's (browser's) view position inside the labyrinth image. This is the top-left point of the view.
+// The client's (browser's) view position inside the Labyrinth image. This is the top-left point of the view.
 var Pos image.Point
 
 // init registers the http handlers.
