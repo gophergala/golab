@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	"image/color"
 	"image/draw"
 	"image/png"
 	"io/ioutil"
@@ -16,7 +15,8 @@ var LabImg *image.RGBA = image.NewRGBA(image.Rect(0, 0, LabWidth, LabHeight))
 // Gopher images for each direction, each has zero Min point
 var GopherImgs []*image.RGBA = make([]*image.RGBA, DirLength)
 
-var GopherDeadImg *image.RGBA
+// Dead Gopher image.
+var DeadImg *image.RGBA
 
 // Bulldog images for each direction, each has zero Min point
 var BulldogImgs []*image.RGBA = make([]*image.RGBA, DirLength)
@@ -28,23 +28,33 @@ var WallImg *image.RGBA
 var EmptyImg = image.NewUniform(Black)
 
 // Image of the empty block
-var TargetImg = image.NewUniform(color.RGBA{0x00, 0xff, 0x00, 0xff})
+//var TargetImg = image.NewUniform(color.RGBA{0x00, 0xff, 0x00, 0xff})
+var TargetImg *image.RGBA
+
+// Image of a door, this is the exit sign
+var ExitImg *image.RGBA
+
+// Image of a congratulation
+var WonImg *image.RGBA
 
 func init() {
 	for i := Dir(0); i < DirLength; i++ {
 		// Load gopher images
-		GopherImgs[i] = loadImg(fmt.Sprintf("w:/gopher-%s.png", i))
+		GopherImgs[i] = loadImg(fmt.Sprintf("w:/gopher-%s.png", i), true)
 		// Load Bulldog images
-		BulldogImgs[i] = loadImg(fmt.Sprintf("w:/bulldog-%s.png", i))
+		BulldogImgs[i] = loadImg(fmt.Sprintf("w:/bulldog-%s.png", i), true)
 	}
 
-	WallImg = loadImg("w:/wall5.png")
+	WallImg = loadImg("w:/wall5.png", true)
+	DeadImg = loadImg("w:/gopher-dead.png", true)
+	ExitImg = loadImg("w:/door.png", true)
 
-	GopherDeadImg = loadImg("w:/gopher-dead.png")
+	TargetImg = loadImg("w:/marker.png", false)
+	WonImg = loadImg("w:/won.png", false)
 }
 
 // loadImg loads a PNG image from the specified file, and converts it to image.RGBA and makes sure image has zero Min point.
-func loadImg(name string) *image.RGBA {
+func loadImg(name string, blockSize bool) *image.RGBA {
 	data, err := ioutil.ReadFile(name)
 	if err != nil {
 		panic(err)
@@ -56,7 +66,7 @@ func loadImg(name string) *image.RGBA {
 
 	// Convert to image.RGBA, also make sure result image has zero Min point
 	b := src.Bounds()
-	if b.Dx() != BlockSize || b.Dy() != BlockSize {
+	if blockSize && (b.Dx() != BlockSize || b.Dy() != BlockSize) {
 		panic("Invalid image size!")
 	}
 

@@ -58,11 +58,13 @@ func simulate() {
 			}
 		}
 
-		// First clear moving objects from the lab image:
+		// Next clear moving objects from the lab image:
 		model.Gopher.EraseImg()
 		for _, bd := range model.Bulldogs {
 			bd.EraseImg()
 		}
+
+		model.DrawImgAt(model.ExitImg, model.ExitPos.X, model.ExitPos.X)
 
 		if !model.Dead {
 			// Draw target positions
@@ -77,6 +79,11 @@ func simulate() {
 		stepGopher()
 		stepBulldogs()
 
+		// Check if Gopher reached the exit point
+		if int(model.Gopher.Pos.X) == model.ExitPos.X && int(model.Gopher.Pos.Y) == model.ExitPos.Y {
+			handleWinning()
+		}
+
 		t = now
 
 		// Sleep some time.
@@ -84,7 +91,13 @@ func simulate() {
 		// We calculate delta time and calculate moving and next positions
 		// based on the delta time.
 
-		model.Mutex.Unlock()              // While sleeping, clients can request view images
+		model.Mutex.Unlock() // While sleeping, clients can request view images
+		if model.Won {
+			// If won, nothing has to be done, just wait for a new game signal
+			<-model.NewGameCh // Blocking receive
+			// Send back value to detect it at the proper place
+			model.NewGameCh <- 1
+		}
 		time.Sleep(time.Millisecond * 50) // ~20 FPS
 		model.Mutex.Lock()                // We will modify model now, labyrinth image might change so lock.
 	}
@@ -159,7 +172,7 @@ func eraseDrawTargetPoss(erase bool) {
 	}
 	// dtp: drawTargetPos
 	dtp := func(TargetPos image.Point) {
-		rect := image.Rect(0, 0, model.TargetSize, model.TargetSize)
+		rect := model.TargetImg.Bounds()
 		rect = rect.Add(image.Pt(TargetPos.X-rect.Dx()/2, TargetPos.Y-rect.Dy()/2))
 		draw.Draw(model.LabImg, rect, img, image.Point{}, draw.Over)
 	}
@@ -175,7 +188,7 @@ func stepGopher() {
 	Gopher := model.Gopher
 
 	if model.Dead {
-		Gopher.DrawWithImg(model.GopherDeadImg)
+		Gopher.DrawWithImg(model.DeadImg)
 		return
 	}
 
@@ -246,15 +259,24 @@ func stepBulldogs() {
 		if !model.Dead {
 			// Check if this Bulldog reached Gopher
 			if math.Abs(gpos.X-bd.Pos.X) < model.BlockSize*0.75 && math.Abs(gpos.Y-bd.Pos.Y) < model.BlockSize*0.75 {
-				processDying()
+				handleDying()
 			}
 		}
 	}
 }
 
-// processDying processes the event of Gopher death.
-func processDying() {
+// handleDying handles the death of Gopher event.
+func handleDying() {
 	model.Dead = true
+}
+
+// handleWinning handles the winning of game event.
+func handleWinning() {
+	model.Won = true
+
+	r := model.WonImg.Bounds()
+	r = r.Add(image.Point{view.Pos.X + view.ViewWidth/2 - r.Dx()/2, view.Pos.Y + view.ViewHeight/2 - r.Dy()/2})
+	draw.Draw(model.LabImg, r, model.WonImg, image.Point{}, draw.Over)
 }
 
 // stepMovingObj steps the specified MovingObj and draws its image to its new position onto the LabImg.

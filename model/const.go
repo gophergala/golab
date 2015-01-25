@@ -18,9 +18,6 @@ const (
 
 	// LabHeight is the height of the labyrinth's image in pixels.
 	LabHeight = Rows * BlockSize
-
-	// Visual size of a target point
-	TargetSize = BlockSize / 4
 )
 
 // V is the moving speed of Gopher in pixel/sec.

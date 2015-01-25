@@ -100,17 +100,20 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 
 	// x, y are in the coordinate system of the client's view.
 	// Translate them to the Labyrinth's coordinate system:
-	model.ClickCh <- model.Click{Pos.X + x, Pos.Y + y, btn}
+	select {
+	case model.ClickCh <- model.Click{Pos.X + x, Pos.Y + y, btn}:
+	default:
+	}
 }
 
-// cheatHandle serves the whole image of the labyrinth
+// cheatHandle serves the whole image of the Labyrinth.
 func cheatHandle(w http.ResponseWriter, r *http.Request) {
 	model.Mutex.Lock()
 	jpeg.Encode(w, model.LabImg, &jpeg.Options{70})
 	model.Mutex.Unlock()
 }
 
-// newGameHandle signals to start a newgame
+// newGameHandle signals to start a newgame.
 func newGameHandle(w http.ResponseWriter, r *http.Request) {
 	// Use non-blocking send
 	select {

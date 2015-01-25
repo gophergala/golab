@@ -5,3 +5,16 @@ https://github.com/golang-samples/gopher-vector
 
 Original Bulldog images from:
 http://www.3dcadbrowser.com/download.aspx?3dmodel=14738
+
+Wall image from:
+http://gamedesign.wdfiles.com/local--files/spriteart%3Asprite-art-101-basic-depth/sprite_art_depth_tutorial_1.png
+
+Target image (marker):
+https://www.iconfinder.com/icons/73052/base_biswajit_chartreuse_con_map_marker_outside_pixe_icon
+
+Door (Exit sign) image from:
+http://www.fengshuiatwork.com/blog/wp-content/uploads/2011/09/front-door.png
+
+Congratulation image from:
+http://www.wetumpkaband.com/images/Congratulations.png
+

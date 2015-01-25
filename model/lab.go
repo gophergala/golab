@@ -42,7 +42,13 @@ func (m *MovingObj) EraseImg() {
 
 // DrawWithImage draws the specified image at the position of the moving object onto the LabImg.
 func (m *MovingObj) DrawWithImg(img image.Image) {
-	r := image.Rect(0, 0, BlockSize, BlockSize).Add(image.Point{int(m.Pos.X) - BlockSize/2, int(m.Pos.Y) - BlockSize/2})
+	DrawImgAt(img, int(m.Pos.X), int(m.Pos.Y))
+}
+
+// DrawImgAt draws the specified image at the specified position which specifies the center of the area to draw.
+// The size of the image draw is the block size.
+func DrawImgAt(img image.Image, x, y int) {
+	r := image.Rect(0, 0, BlockSize, BlockSize).Add(image.Point{x - BlockSize/2, y - BlockSize/2})
 	draw.Draw(LabImg, r, img, image.Point{}, draw.Over)
 }
 
@@ -52,11 +58,17 @@ var Gopher = new(MovingObj)
 // Dead tells if Gopher died
 var Dead bool
 
+// Tells if we won
+var Won bool
+
 // For Gopher we maintain multiple target positions which define a path on which Gopher will move along
 var TargetPoss = make([]image.Point, 0, 10)
 
 // Slice of Bulldogs, the ancient enemy of Gophers.
 var Bulldogs = make([]*MovingObj, Rows*Cols/100)
+
+// Exit position
+var ExitPos = image.Point{}
 
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
@@ -79,6 +91,7 @@ var ClickCh = make(chan Click, 10)
 // InitNew initializes a new game.
 func InitNew() {
 	Dead = false
+	Won = false
 
 	initLab()
 
@@ -87,6 +100,8 @@ func InitNew() {
 	initBulldogs()
 
 	initLabImg()
+
+	ExitPos.X, ExitPos.Y = (Cols-2)*BlockSize+BlockSize/2, (Rows-2)*BlockSize+BlockSize/2
 }
 
 // initLab initializes and generates a new Labyrinth.
@@ -122,9 +137,9 @@ func initBulldogs() {
 		Bulldogs[i] = bd
 
 		// Place bulldog at a random position
-		var row, col int
+		var row, col = int(Gopher.Pos.Y) / BlockSize, int(Gopher.Pos.X) / BlockSize
 		// Give some space to Gopher: do not generate Bulldogs too close:
-		for ; row < 5 || col < 5; row, col = rPassPos(0, Rows), rPassPos(0, Cols) {
+		for gr, gc := row, col; (row-gr)*(row-gr) <= 16 && (col-gc)*(col-gc) <= 16; row, col = rPassPos(0, Rows), rPassPos(0, Cols) {
 		}
 
 		bd.Pos.X = float64(col*BlockSize + BlockSize/2)
