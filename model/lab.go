@@ -58,10 +58,16 @@ var Bulldogs = make([]*MovingObj, Rows*Cols/100)
 // Channel to signal new game
 var NewGameCh = make(chan int, 1)
 
+// Constant for the right Mouse button value in the Click struct.
+// Button value for left and middle may not be the same for older browsers, but right button always has this value.
+const MouseBtnRight = 2
+
 // Click describes a mouse click.
 type Click struct {
 	// X, Y are the mouse coordinates in pixel, in the coordinate system of the Labyrinth
 	X, Y int
+	// Btn is the mouse button
+	Btn int
 }
 
 // Channel to receive mouse clicks on (view package sends, ctrl package (engine) processes them)

@@ -4,7 +4,7 @@ GoLab
 Introduction
 ---
 
-**Gopher's Labyrinth** (or just **GoLab**) is a 2-dimensional Labyrinth game where you control [Gopher](http://golang.org/doc/gopher/frontpage.png) (who else) and your goal is to get to the Exit point of the Labyrinth. Controlling Gopher is very easy: just click with your mouse to where you want it to move (but there must be a free straight line to it).
+**Gopher's Labyrinth** (or just **GoLab**) is a 2-dimensional Labyrinth game where you control [Gopher](http://golang.org/doc/gopher/frontpage.png) (who else) and your goal is to get to the Exit point of the Labyrinth. Controlling Gopher is very easy: just click with your _left_ mouse button to where you want it to move (but there must be a free straight line to it). You can even queue multiple target points forming a _path_ on which Gopher will move along. If you click with the _right_ mouse button, the path will be cleared.
 
 TODO: Screenshot
 

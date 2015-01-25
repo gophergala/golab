@@ -93,10 +93,14 @@ func clickedHandle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	btn, err := strconv.Atoi(r.FormValue("b"))
+	if err != nil {
+		return
+	}
 
 	// x, y are in the coordinate system of the client's view.
 	// Translate them to the Labyrinth's coordinate system:
-	model.ClickCh <- model.Click{Pos.X + x, Pos.Y + y}
+	model.ClickCh <- model.Click{Pos.X + x, Pos.Y + y, btn}
 }
 
 // cheatHandle serves the whole image of the labyrinth

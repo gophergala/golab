@@ -125,7 +125,7 @@ const play_html = `<html>
     	}
     	
 		var r = new XMLHttpRequest();
-		r.open("GET", "/clicked?x=" + x + "&y=" + y + "&t=" + new Date().getTime(), true);
+		r.open("GET", "/clicked?x=" + x + "&y=" + y + "&b=" + e.button + "&t=" + new Date().getTime(), true);
 		r.send(null);
 	}
 	

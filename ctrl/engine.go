@@ -43,6 +43,10 @@ func simulate() {
 		default:
 		}
 
+		// First erase target images. We have to do this before handling mouse clicks
+		// as they may change the target positions
+		eraseDrawTargetPoss(true)
+
 		// Process mouse clicks
 	clickLoop:
 		for {
@@ -61,7 +65,7 @@ func simulate() {
 		}
 
 		// Draw target positions
-		drawTargetPoss()
+		eraseDrawTargetPoss(false)
 
 		now := time.Now().UnixNano()
 		dt = float64(now-t) / 1e9
@@ -88,8 +92,11 @@ func simulate() {
 func handleClick(c model.Click) {
 	Gopher := model.Gopher
 
+	if c.Btn == model.MouseBtnRight {
+		model.TargetPoss = model.TargetPoss[0:0]
+	}
+
 	// If target buffer is full, do nothing:
-	// int(Gopher.Pos.X) != Gopher.TargetPos.X || int(Gopher.Pos.Y) != Gopher.TargetPos.Y
 	if len(model.TargetPoss) == cap(model.TargetPoss) {
 		return
 	}
@@ -136,13 +143,19 @@ func handleClick(c model.Click) {
 	model.TargetPoss = append(model.TargetPoss, image.Pt(tCol*model.BlockSize+model.BlockSize/2, tRow*model.BlockSize+model.BlockSize/2))
 }
 
-// drawTargetPoss draws target positions of Gopher, both the current and the buffered ones.
-func drawTargetPoss() {
+// eraseDrawTargetPoss either erases or draws target positions of Gopher, both the current and the buffered ones.
+func eraseDrawTargetPoss(erase bool) {
+	var img image.Image
+	if erase {
+		img = model.EmptyImg
+	} else {
+		img = model.TargetImg
+	}
 	// dtp: drawTargetPos
 	dtp := func(TargetPos image.Point) {
-		rect := image.Rect(0, 0, model.BlockSize/4, model.BlockSize/4)
+		rect := image.Rect(0, 0, model.TargetSize, model.TargetSize)
 		rect = rect.Add(image.Pt(TargetPos.X-rect.Dx()/2, TargetPos.Y-rect.Dy()/2))
-		draw.Draw(model.LabImg, rect, model.TargetImg, image.Point{}, draw.Over)
+		draw.Draw(model.LabImg, rect, img, image.Point{}, draw.Over)
 	}
 
 	dtp(model.Gopher.TargetPos)
