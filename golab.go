@@ -16,7 +16,7 @@ var port int
 // processFlags registers flags, parses them and validates them.
 // Returns nil if everything is ok, else an error.
 func processFlags() error {
-	flag.IntVar(&port, "port", 60148, "Port to start the UI web server on; valid range: 0..65535")
+	flag.IntVar(&port, "port", 1234, "Port to start the UI web server on; valid range: 0..65535")
 
 	flag.Parse()
 
