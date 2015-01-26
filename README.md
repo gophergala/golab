@@ -8,7 +8,7 @@ Introduction
 
 Controlling Gopher is very easy: just click with your _left_ mouse button to where you want him to move (but there must be a free straight line to it). You can even queue multiple target points forming a _path_ on which Gopher will move along. If you click with the _right_ mouse button, the path will be cleared.
 
-TODO: Screenshot
+<img src="https://github.com/gophergala/golab/blob/master/golab-screenshot.png" alt="GoLab Screenshot" title="alt="GoLab Screenshot">
 
 GoLab is written completely in [Go](http://golang.org/), but there is a thin HTML layer because the User Interface (UI) of the game is an HTML page (web page). GoLab doesn't use any platform dependent or native code, so you can start the application on any platforms supported by a Go compiler (including Windows, Linux and MAC OS-X). Since the UI is a simple HTML page, you can play the game from any browsers on any platforms, even from mobile phones and tablets (no HTML5 capable browser is required). Also the device you play from doesn't need to be the same computer where you start the application, so for example you can start the game on your desktop computer and connect to it and play the game from your smart phone. The solution used (web UI server) provides multi-player support out-of-the-box, although this Labyrinth game doesn't make use of it (the same Gopher can be controlled by all clients). Everything is stored in the (Go) application, you can close the browser and reopen it (even on a different device) and nothing will be lost.
 
