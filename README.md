@@ -1,6 +1,9 @@
 GoLab
 ===
 
+_This game is reincarnated in [icza/golab](https://github.com/icza/golab)._
+
+
 Introduction
 ---
 
